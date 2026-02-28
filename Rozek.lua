@@ -380,8 +380,8 @@ GUI.Parent       = lp.PlayerGui
 
 -- Frame principal — más ancho para 2 botones bien proporcionados
 local Frame = Instance.new("Frame")
-Frame.Size             = UDim2.new(0, 200, 0, 70)
-Frame.Position         = UDim2.new(0.5, -100, 0, 12)
+Frame.Size             = UDim2.new(0, 170, 0, 58)
+Frame.Position         = UDim2.new(0.5, -85, 0, 12)
 Frame.BackgroundColor3 = Color3.fromRGB(8, 8, 12)
 Frame.BorderSizePixel  = 0
 Frame.Active           = true
@@ -440,8 +440,8 @@ end
 
 -- Contenedor botones
 local BtnContainer = Instance.new("Frame")
-BtnContainer.Size             = UDim2.new(1, -12, 0, 36)
-BtnContainer.Position         = UDim2.new(0, 6, 0, 26)
+BtnContainer.Size             = UDim2.new(1, -10, 0, 28)
+BtnContainer.Position         = UDim2.new(0, 5, 0, 24)
 BtnContainer.BackgroundTransparency = 1
 BtnContainer.Parent           = Frame
 
@@ -550,83 +550,14 @@ end)
 
 print("[Rozek v2] Listo — God Mode | Auto Brain | Instant Pickup ON")
 -- ══════════════════════════════════════
---  INFINITE JUMP
+--  INFINITE JUMP — SIEMPRE ACTIVO
 -- ══════════════════════════════════════
-local infiniteJumpActive = false
-local infiniteJumpConn   = nil
-local BtnJump
-
-local function startInfiniteJump()
-    if infiniteJumpConn then infiniteJumpConn:Disconnect(); infiniteJumpConn = nil end
-    infiniteJumpConn = UIS.JumpRequest:Connect(function()
-        local char = lp.Character
-        local hum  = char and char:FindFirstChildOfClass("Humanoid")
-        if hum then
-            hum:ChangeState(Enum.HumanoidStateType.Jumping)
-        end
-    end)
-end
-
-local function stopInfiniteJump()
-    if infiniteJumpConn then infiniteJumpConn:Disconnect(); infiniteJumpConn = nil end
-end
-
--- Conectar también al resetOnDeath existente
-local _origResetOnDeath = resetOnDeath
-resetOnDeath = function()
-    _origResetOnDeath()
-    infiniteJumpActive = false
-    stopInfiniteJump()
-    if BtnJump then
-        BtnJump.Text             = "🦘 Inf Jump"
-        BtnJump.BackgroundColor3 = Color3.fromRGB(20, 30, 55)
-    end
-end
-
--- Ampliar frame para el 3er botón
-Frame.Size = UDim2.new(0, 290, 0, 70)
-Frame.Position = UDim2.new(0.5, -145, 0, 12)
-
--- Ajustar tamaño de botones existentes para que quepan 3
-BtnGod.Size  = UDim2.new(0, 88, 1, 0)
-BtnAuto.Size = UDim2.new(0, 88, 1, 0)
-
--- Crear botón Infinite Jump
-BtnJump = Instance.new("TextButton")
-BtnJump.Size             = UDim2.new(0, 88, 1, 0)
-BtnJump.BackgroundColor3 = Color3.fromRGB(20, 30, 55)
-BtnJump.TextColor3       = Color3.fromRGB(255, 255, 255)
-BtnJump.Font             = Enum.Font.GothamBold
-BtnJump.TextSize         = 10
-BtnJump.Text             = "🦘 Inf Jump"
-BtnJump.BorderSizePixel  = 0
-BtnJump.LayoutOrder      = 3
-BtnJump.Parent           = BtnContainer
-Instance.new("UICorner", BtnJump).CornerRadius = UDim.new(0, 7)
-
-BtnJump.Activated:Connect(function()
-    infiniteJumpActive = not infiniteJumpActive
-    if infiniteJumpActive then
-        BtnJump.Text             = "🛑 Jump OFF"
-        BtnJump.BackgroundColor3 = Color3.fromRGB(55, 10, 10)
-        startInfiniteJump()
-    else
-        stopInfiniteJump()
-        BtnJump.Text             = "🦘 Inf Jump"
-        BtnJump.BackgroundColor3 = Color3.fromRGB(20, 30, 55)
-    end
-    updateDot()
-end)
-
--- Rainbow en BtnJump cuando inactivo
-local _origHeartbeat = RS.Heartbeat
--- Extender el rainbow existente para incluir BtnJump
-local rainbowHue2 = 0.33
-RS.Heartbeat:Connect(function(dt)
-    rainbowHue2 = (rainbowHue2 + dt * 0.4) % 1
-    if BtnJump and not infiniteJumpActive then
-        BtnJump.TextColor3 = Color3.fromHSV((rainbowHue2 + 0.15) % 1, 0.85, 1)
+UIS.JumpRequest:Connect(function()
+    local char = lp.Character
+    local hum  = char and char:FindFirstChildOfClass("Humanoid")
+    if hum then
+        hum:ChangeState(Enum.HumanoidStateType.Jumping)
     end
 end)
 
-print("[Rozek v3] Infinite Jump agregado")
+print("[Rozek v3] Infinite Jump ON — siempre activo")
