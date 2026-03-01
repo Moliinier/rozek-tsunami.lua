@@ -1,22 +1,23 @@
 --[[
-  ╔══════════════════════════════════════╗
-  ║           ROZEK v3                   ║
-  ║  - God Mode (bajo el suelo)          ║
-  ║  - Instant Pickup: SIEMPRE ACTIVO    ║
-  ║  - Auto Brain: agarra brainrots      ║
-  ║  - Remove Map: carga/revierte mapa   ║
-  ║  - Infinite Jump: SIEMPRE ACTIVO     ║
-  ║  - GUI compacta 3 filas, arrastrable ║
-  ╚══════════════════════════════════════╝
+  +==========================================+
+  |              ROZEK v4                    |
+  |  - God Mode                              |
+  |  - Auto Brain                            |
+  |  - Instant Pickup: SIEMPRE ACTIVO        |
+  |  - Infinite Jump: SIEMPRE ACTIVO         |
+  |  - Remove Map: oculta mapa base          |
+  |    automaticamente al cargar             |
+  +==========================================+
 ]]
 
-local Players        = game:GetService("Players")
-local RS             = game:GetService("RunService")
-local UIS            = game:GetService("UserInputService")
+local Players   = game:GetService("Players")
+local RS        = game:GetService("RunService")
+local UIS       = game:GetService("UserInputService")
 local ProximityPromptService = game:GetService("ProximityPromptService")
-local lp             = Players.LocalPlayer
-local cam            = workspace.CurrentCamera
-local pg             = lp.PlayerGui
+
+local lp  = Players.LocalPlayer
+local cam = workspace.CurrentCamera
+local pg  = lp.PlayerGui
 
 local OFFSET_Y   = -18
 local CAM_HEIGHT = 7
@@ -25,149 +26,378 @@ local heartbeat
 local fakePart
 local godData
 
-local godActive        = false
-local autoBrainActive  = false
-local autoBrainThread  = nil
-local removeActive     = false
+local godActive       = false
+local autoBrainActive = false
+local autoBrainThread = nil
+local removeActive    = false
+
 local BtnGod, BtnAuto, BtnRemove
 
--- ══════════════════════════════════════
+-- =============================================
 --  MAP DATA (rozek_map.json embebido)
--- ══════════════════════════════════════
-
--- Partes del mapa original a eliminar (restaurar al desactivar Remove)
-local MAP_DELETED = {
-    -- 1
-    {path="Workspace.DefaultMap_SharedInstances.Floors.Common", color=Color3.fromRGB(96,151,60), mat=Enum.Material.Plastic, name="Common", pos=Vector3.new(242,-2.999980926513672,-5.6016146118054166e-05), size=Vector3.new(70,6,260)},
-    -- 2
-    {path="Workspace.DefaultMap.Spawners.Common", color=Color3.fromRGB(96,151,60), mat=Enum.Material.Plastic, name="Common", pos=Vector3.new(242,-2.999980926513672,-5.6016146118054166e-05), size=Vector3.new(70,6,260)},
-    -- 3
-    {path="Workspace.DefaultMap_SharedInstances.Gaps.Gap1.Mud", color=Color3.fromRGB(213,115,61), mat=Enum.Material.Plastic, name="Mud", pos=Vector3.new(200,-9.024967193603516,-5.0485989049775526e-05), size=Vector3.new(6.049999237060547,260,14)},
-    -- 4
-    {path="Workspace.DefaultMap.FirstFloor", color=Color3.fromRGB(96,151,60), mat=Enum.Material.Plastic, name="FirstFloor", pos=Vector3.new(173,-2.999980926513672,-5.9032230637967587e-05), size=Vector3.new(40,6,260)},
-    -- 5
-    {path="Workspace.DefaultMap.Gaps.Gap1.Mud", color=Color3.fromRGB(213,115,61), mat=Enum.Material.Plastic, name="Mud", pos=Vector3.new(200,-9.024967193603516,-5.8115383581025526e-05), size=Vector3.new(6.049999237060547,260,14)},
-    -- 6
-    {path="Workspace.DefaultMap.Ground", color=Color3.fromRGB(47,151,36), mat=Enum.Material.Plastic, name="Ground", pos=Vector3.new(72.99999237060547,-2.999980926513672,-6.340337131405249e-05), size=Vector3.new(160,6,376)},
-    -- 7
-    {path="Workspace.GameObjects.PlaceSpecific.root.Misc.Roof", color=Color3.fromRGB(163,162,165), mat=Enum.Material.Plastic, name="Roof", pos=Vector3.new(1182.5,68.49999237060547,7.62939453125e-06), size=Vector3.new(2047,1,260)},
-    -- 8
-    {path="Workspace.DefaultMap_SharedInstances.Floors.Uncommon", color=Color3.fromRGB(115,151,60), mat=Enum.Material.Plastic, name="Uncommon", pos=Vector3.new(341,-2.999980926513672,-5.168871575733647e-05), size=Vector3.new(100,6,260)},
-    -- 9
-    {path="Workspace.DefaultMap.Spawners.Uncommon", color=Color3.fromRGB(115,151,60), mat=Enum.Material.Plastic, name="Uncommon", pos=Vector3.new(341,-2.999980926513672,-5.168871575733647e-05), size=Vector3.new(100,6,260)},
-    -- 10
-    {path="Workspace.DefaultMap_SharedInstances.Gaps.Gap2.Mud", color=Color3.fromRGB(213,115,61), mat=Enum.Material.Plastic, name="Mud", pos=Vector3.new(284,-9.024967193603516,-4.6814231609459966e-05), size=Vector3.new(6.049999237060547,260,14)},
-    -- 11
-    {path="Workspace.DefaultMap.Gaps.Gap2.Mud", color=Color3.fromRGB(213,115,61), mat=Enum.Material.Plastic, name="Mud", pos=Vector3.new(284,-9.024967193603516,-5.4443626140709966e-05), size=Vector3.new(6.049999237060547,260,14)},
-    -- 12
-    {path="Workspace.DefaultMap_SharedInstances.Floors.Rare", color=Color3.fromRGB(130,151,60), mat=Enum.Material.Plastic, name="Rare", pos=Vector3.new(470,-2.999980926513672,-4.604995046975091e-05), size=Vector3.new(130,6,260)},
-    -- 13
-    {path="Workspace.DefaultMap.Spawners.Rare", color=Color3.fromRGB(130,151,60), mat=Enum.Material.Plastic, name="Rare", pos=Vector3.new(470,-2.999980926513672,-4.604995046975091e-05), size=Vector3.new(130,6,260)},
-    -- 14
-    {path="Workspace.DefaultMap_SharedInstances.Gaps.Gap3.Mud", color=Color3.fromRGB(213,115,61), mat=Enum.Material.Plastic, name="Mud", pos=Vector3.new(398,-9.024967193603516,-4.1831131966318935e-05), size=Vector3.new(6.049999237060547,260,14)},
-    -- 15
-    {path="Workspace.DefaultMap.Gaps.Gap3.Mud", color=Color3.fromRGB(213,115,61), mat=Enum.Material.Plastic, name="Mud", pos=Vector3.new(398,-9.024967193603516,-4.9460526497568935e-05), size=Vector3.new(6.049999237060547,260,14)},
-    -- 16
-    {path="Workspace.DefaultMap_SharedInstances.Gaps.Gap4.Mud", color=Color3.fromRGB(213,115,61), mat=Enum.Material.Plastic, name="Mud", pos=Vector3.new(542.0001220703125,-9.024967193603516,-3.5536686482373625e-05), size=Vector3.new(6.049999237060547,260,14)},
-    -- 17
-    {path="Workspace.DefaultMap.Gaps.Gap4.Mud", color=Color3.fromRGB(213,115,61), mat=Enum.Material.Plastic, name="Mud", pos=Vector3.new(542,-9.024967193603516,-4.316608828958124e-05), size=Vector3.new(6.049999237060547,260,14)},
-    -- 18
-    {path="Workspace.DefaultMap_SharedInstances.Floors.Epic", color=Color3.fromRGB(142,151,60), mat=Enum.Material.Plastic, name="Epic", pos=Vector3.new(649,-2.999980926513672,-3.8225611206144094e-05), size=Vector3.new(200,6,260)},
-    -- 19
-    {path="Workspace.DefaultMap.Spawners.Epic", color=Color3.fromRGB(142,151,60), mat=Enum.Material.Plastic, name="Epic", pos=Vector3.new(649,-2.999980926513672,-3.8225611206144094e-05), size=Vector3.new(200,6,260)},
-    -- 20
-    {path="Workspace.DefaultMap_SharedInstances.Floors.Legendary", color=Color3.fromRGB(151,151,61), mat=Enum.Material.Plastic, name="Legendary", pos=Vector3.new(913,-2.999980926513672,-2.668580418685451e-05), size=Vector3.new(300,6,260)},
-    -- 21
-    {path="Workspace.DefaultMap.Spawners.Legendary", color=Color3.fromRGB(151,151,61), mat=Enum.Material.Plastic, name="Legendary", pos=Vector3.new(913,-2.999980926513672,-2.668580418685451e-05), size=Vector3.new(300,6,260)},
-    -- 22
-    {path="Workspace.DefaultMap_SharedInstances.Gaps.Gap5.Mud", color=Color3.fromRGB(213,115,61), mat=Enum.Material.Plastic, name="Mud", pos=Vector3.new(756.0001220703125,-9.024967193603516,-2.6182453439105302e-05), size=Vector3.new(6.049999237060547,260,14)},
-    -- 23
-    {path="Workspace.DefaultMap.Gaps.Gap5.Mud", color=Color3.fromRGB(213,115,61), mat=Enum.Material.Plastic, name="Mud", pos=Vector3.new(756,-9.024967193603516,-3.381185160833411e-05), size=Vector3.new(6.049999237060547,260,14)},
-    -- 24
-    {path="Workspace.DefaultMap.Spawners.Mythical", color=Color3.fromRGB(151,147,42), mat=Enum.Material.Plastic, name="Mythical", pos=Vector3.new(1310,-2.999980926513672,-9.33238334255293e-06), size=Vector3.new(450,6,260)},
-    -- 25
-    {path="Workspace.DefaultMap_SharedInstances.Floors.Mythical", color=Color3.fromRGB(151,147,42), mat=Enum.Material.Plastic, name="Mythical", pos=Vector3.new(1310,-2.999980926513672,-9.33238334255293e-06), size=Vector3.new(450,6,260)},
-    -- 26
-    {path="Workspace.DefaultMap_SharedInstances.Gaps.Gap6.Mud", color=Color3.fromRGB(213,115,61), mat=Enum.Material.Plastic, name="Mud", pos=Vector3.new(1074,-9.024967193603516,-1.2107389920856804e-05), size=Vector3.new(6.049999237060547,260,22)},
-    -- 27
-    {path="Workspace.DefaultMap.Gaps.Gap6.Mud", color=Color3.fromRGB(213,115,61), mat=Enum.Material.Plastic, name="Mud", pos=Vector3.new(1074,-9.024967193603516,-1.991162935155444e-05), size=Vector3.new(6.049999237060547,260,22)},
-    -- 28
-    {path="Workspace.DefaultMap_SharedInstances.Gaps.Gap7.Mud", color=Color3.fromRGB(213,115,61), mat=Enum.Material.Plastic, name="Mud", pos=Vector3.new(1555,-9.024967193603516,9.311188478022814e-06), size=Vector3.new(6.049999237060547,260,40)},
-    -- 29
-    {path="Workspace.DefaultMap.Gaps.Gap7.Mud", color=Color3.fromRGB(213,115,61), mat=Enum.Material.Plastic, name="Mud", pos=Vector3.new(1555,-9.024967193603516,1.1135489330627024e-06), size=Vector3.new(6.049999237060547,260,40)},
-    -- 30
-    {path="Workspace.DefaultMap_SharedInstances.Floors.Cosmic", color=Color3.fromRGB(171,165,0), mat=Enum.Material.Plastic, name="Cosmic", pos=Vector3.new(1900,-2.999980926513672,1.6457335732411593e-05), size=Vector3.new(650,6,260)},
-    -- 31
-    {path="Workspace.DefaultMap.Spawners.Cosmic", color=Color3.fromRGB(171,165,0), mat=Enum.Material.Plastic, name="Cosmic", pos=Vector3.new(1900,-2.999980926513672,1.6457335732411593e-05), size=Vector3.new(650,6,260)},
-    -- 32
-    {path="Workspace.DefaultMap_SharedInstances.Gaps.Gap7.Mud", color=Color3.fromRGB(213,115,61), mat=Enum.Material.Plastic, name="Mud", pos=Vector3.new(2252.5,-9.024967193603516,3.9799881051294506e-05), size=Vector3.new(6.049999237060547,260,55)},
-    -- 33
-    {path="Workspace.DefaultMap.Gaps.Gap8.Mud", color=Color3.fromRGB(213,115,61), mat=Enum.Material.Plastic, name="Mud", pos=Vector3.new(2252.5,-9.024967193603516,3.1602241506334394e-05), size=Vector3.new(6.049999237060547,260,55)},
-    -- 34
-    {path="Workspace.DefaultMap_SharedInstances.AllowedSpaces.Waves2", color=Color3.fromRGB(163,162,165), mat=Enum.Material.Plastic, name="Waves2", pos=Vector3.new(3031.5498046875,28.95001983642578,-1.9999289512634277), size=Vector3.new(2048,82.0999984741211,276)},
-    -- 35
-    {path="Workspace.GameObjects.PlaceSpecific.root.Misc.Roof", color=Color3.fromRGB(163,162,165), mat=Enum.Material.Plastic, name="Roof", pos=Vector3.new(2570.5,68.49999237060547,0), size=Vector3.new(729,1,260)},
-    -- 36
-    {path="Workspace.DefaultMap_SharedInstances.Floors.Cosmic", color=Color3.fromRGB(171,165,0), mat=Enum.Material.Plastic, name="Cosmic", pos=Vector3.new(2605,-2.999980926513672,4.727386840386316e-05), size=Vector3.new(650,6,260)},
-    -- 37
-    {path="Workspace.DefaultMap.Spawners.Cosmic", color=Color3.fromRGB(171,165,0), mat=Enum.Material.Plastic, name="Cosmic", pos=Vector3.new(2605,-2.999980926513672,4.727386840386316e-05), size=Vector3.new(650,6,260)},
-    -- 38
-    {path="Workspace.DefaultMap_SharedInstances.Gaps.Gap8.Mud", color=Color3.fromRGB(213,115,61), mat=Enum.Material.Plastic, name="Mud", pos=Vector3.new(2957.5,-9.024967193603516,7.094425382092595e-05), size=Vector3.new(6.049999237060547,260,55)},
-    -- 39
-    {path="Workspace.DefaultMap.Gaps.Gap8.Mud", color=Color3.fromRGB(213,115,61), mat=Enum.Material.Plastic, name="Mud", pos=Vector3.new(2957.5,-9.024967193603516,6.241878145374358e-05), size=Vector3.new(6.049999237060547,260,55)},
-    -- 40
-    {path="Workspace.GameObjects.PlaceSpecific.root.Misc.Roof", color=Color3.fromRGB(163,162,165), mat=Enum.Material.Plastic, name="Roof", pos=Vector3.new(3613.00439453125,70.50003051757812,0), size=Vector3.new(1475.5003662109375,1,260)},
-    -- 41
-    {path="Workspace.DefaultMap_SharedInstances.Floors.Secret1", color=Color3.fromRGB(203,193,0), mat=Enum.Material.Plastic, name="Secret1", pos=Vector3.new(3135,-2.999980926513672,7.044090307317674e-05), size=Vector3.new(299.9999694824219,6,260)},
-    -- 42
-    {path="Workspace.DefaultMap.Spawners.Secret", color=Color3.fromRGB(203,193,0), mat=Enum.Material.Plastic, name="Secret", pos=Vector3.new(3135,-2.999980926513672,7.044090307317674e-05), size=Vector3.new(299.9999694824219,6,260)},
-    -- 43
-    {path="Workspace.DefaultMap_SharedInstances.Floors.Secret2", color=Color3.fromRGB(203,193,0), mat=Enum.Material.Plastic, name="Secret2", pos=Vector3.new(3490,-2.999980926513672,8.595845429226756e-05), size=Vector3.new(299.9999694824219,6,260)},
-    -- 44
-    {path="Workspace.DefaultMap.Spawners.Secret", color=Color3.fromRGB(203,193,0), mat=Enum.Material.Plastic, name="Secret", pos=Vector3.new(3490,-2.999980926513672,8.595845429226756e-05), size=Vector3.new(299.9999694824219,6,260)},
-    -- 45
-    {path="Workspace.DefaultMap_SharedInstances.Gaps.Gap8.Mud", color=Color3.fromRGB(213,115,61), mat=Enum.Material.Plastic, name="Mud", pos=Vector3.new(3312.5,-9.024967193603516,8.646179048810154e-05), size=Vector3.new(6.049999237060547,260,55)},
-    -- 46
-    {path="Workspace.DefaultMap.Gaps.Gap8.Mud", color=Color3.fromRGB(213,115,61), mat=Enum.Material.Plastic, name="Mud", pos=Vector3.new(3312.5,-9.024967193603516,7.793631812091917e-05), size=Vector3.new(6.049999237060547,260,55)},
-    -- 47
-    {path="Workspace.DefaultMap_SharedInstances.Gaps.Gap9.Mud", color=Color3.fromRGB(213,115,61), mat=Enum.Material.Plastic, name="Mud", pos=Vector3.new(3667.5,-9.024967193603516,0.00010197934170719236), size=Vector3.new(6.049999237060547,260,55)},
-    -- 48
-    {path="Workspace.DefaultMap.Gaps.Gap9.Mud", color=Color3.fromRGB(213,115,61), mat=Enum.Material.Plastic, name="Mud", pos=Vector3.new(3667.5,-9.024967193603516,9.345386934000999e-05), size=Vector3.new(6.049999237060547,260,55)},
-    -- 49
-    {path="Workspace.DefaultMap_SharedInstances.Floors.Secret3", color=Color3.fromRGB(203,193,0), mat=Enum.Material.Plastic, name="Secret3", pos=Vector3.new(3853,-2.999980926513672,0.00010182568803429604), size=Vector3.new(299.9999694824219,6,260)},
-    -- 50
-    {path="Workspace.DefaultMap.Spawners.Secret", color=Color3.fromRGB(203,193,0), mat=Enum.Material.Plastic, name="Secret", pos=Vector3.new(3853,-2.999980926513672,0.00010182568803429604), size=Vector3.new(299.9999694824219,6,260)},
-    -- 51
-    {path="Workspace.DefaultMap.Spawners.Celestial", color=Color3.fromRGB(203,193,0), mat=Enum.Material.Plastic, name="Celestial", pos=Vector3.new(3845,-2.999980926513672,0.00010147599095944315), size=Vector3.new(299.9999694824219,6,260)},
-    -- 52
-    {path="Workspace.WackyWave_Visual.Hitbox3", color=Color3.fromRGB(163,162,165), mat=Enum.Material.Plastic, name="Hitbox3", pos=Vector3.new(3986.6650390625,16.374998092651367,86.66679382324219), size=Vector3.new(25.516000747680664,28.75,86.66666412353516)},
-    -- 53
-    {path="Workspace.DefaultMap_SharedInstances.Gaps.Gap9.Mud", color=Color3.fromRGB(213,115,61), mat=Enum.Material.Plastic, name="Mud", pos=Vector3.new(4022.5,-9.024967193603516,0.00011749687837436795), size=Vector3.new(6.049999237060547,260,55)},
-    -- 54
-    {path="Workspace.DefaultMap.Gaps.Gap9.Mud", color=Color3.fromRGB(213,115,61), mat=Enum.Material.Plastic, name="Mud", pos=Vector3.new(4022.5,-9.024967193603516,0.00010897140600718558), size=Vector3.new(6.049999237060547,260,55)},
-    -- 55
-    {path="Workspace.DefaultMap_SharedInstances.AllowedSpaces.Waves3", color=Color3.fromRGB(163,162,165), mat=Enum.Material.Plastic, name="Waves3", pos=Vector3.new(4205.77490234375,28.95001983642578,-1.9998775720596313), size=Vector3.new(300.45037841796875,82.0999984741211,276)},
-    -- 56
-    {path="Workspace.DefaultMap_SharedInstances.Floors.Celestial", color=Color3.fromRGB(203,193,0), mat=Enum.Material.Plastic, name="Celestial", pos=Vector3.new(4164.5,-3,0), size=Vector3.new(229,6,260)},
-    -- 57
-    {path="Workspace.DefaultMap.Spawners.Divine", color=Color3.fromRGB(203,193,0), mat=Enum.Material.Plastic, name="Divine", pos=Vector3.new(4164.5,-3,0), size=Vector3.new(229,6,260)},
-    -- 58
-    {path="Workspace.DefaultMap.TowerGround", color=Color3.fromRGB(203,193,0), mat=Enum.Material.Plastic, name="TowerGround", pos=Vector3.new(4314.5,-2.999980926513672,0.00012199849879834801), size=Vector3.new(70.99995422363281,6,260)},
-    -- 59
-    {path="Workspace.GameObjects.PlaceSpecific.root.Tower.Part", color=Color3.fromRGB(91,93,105), mat=Enum.Material.Plastic, name="Part", pos=Vector3.new(4313.83251953125,0.7993392944335938,-2.1244149208068848), size=Vector3.new(57.65837860107422,2.351409435272217,110.23884582519531)},
-    -- 60
-    {path="Workspace.GameObjects.PlaceSpecific.root.Tower.Part", color=Color3.fromRGB(91,93,105), mat=Enum.Material.Plastic, name="Part", pos=Vector3.new(4304.29052734375,0.14192962646484375,-1.0978106260299683), size=Vector3.new(47.632408142089844,1.671976089477539,76.73004150390625)},
-    -- 61
-    {path="Workspace.GameObjects.PlaceSpecific.root.Tower.Part", color=Color3.fromRGB(91,93,105), mat=Enum.Material.Plastic, name="Part", pos=Vector3.new(4321.7470703125,1.3091659545898438,-2.0213727951049805), size=Vector3.new(41.82893371582031,3.3711633682250977,209.2733612060547)},
-    -- 62
-    {path="Workspace.GameObjects.PlaceSpecific.root.Tower.Union", color=Color3.fromRGB(91,93,105), mat=Enum.Material.Plastic, name="Union", pos=Vector3.new(4317.72802734375,21.425193786621094,41.32973861694336), size=Vector3.new(10.984474182128906,20.510284423828125,48.470699310302734)},
-    -- 63
-    {path="Workspace.GameObjects.PlaceSpecific.root.Tower.Part", color=Color3.fromRGB(91,93,105), mat=Enum.Material.Plastic, name="Part", pos=Vector3.new(4317.7275390625,0.16042327880859375,-1.9564944505691528), size=Vector3.new(10.984707832336426,103.94568634033203,7.073647499084473)},
-    -- 64
-    {path="Workspace.GameObjects.PlaceSpecific.root.Tower.Union", color=Color3.fromRGB(91,93,105), mat=Enum.Material.Plastic, name="Union", pos=Vector3.new(4317.7275390625,20.527273178100586,-46.674198150634766), size=Vector3.new(10.984474182128906,20.510276794433594,46.67484664916992)},
+-- =============================================
+local MAP_DELETED={
+    {"Workspace.DefaultMap_SharedInstances.Floors.Common",Vector3.new(242,-3,0)},
+    {"Workspace.DefaultMap.Spawners.Common",Vector3.new(242,-3,0)},
+    {"Workspace.DefaultMap_SharedInstances.Gaps.Gap1.Mud",Vector3.new(200,-9.025,0)},
+    {"Workspace.DefaultMap.FirstFloor",Vector3.new(173,-3,0)},
+    {"Workspace.DefaultMap.Gaps.Gap1.Mud",Vector3.new(200,-9.025,0)},
+    {"Workspace.DefaultMap.Ground",Vector3.new(73,-3,0)},
+    {"Workspace.GameObjects.PlaceSpecific.root.Misc.Roof",Vector3.new(1182.5,68.5,0)},
+    {"Workspace.DefaultMap_SharedInstances.Floors.Uncommon",Vector3.new(341,-3,0)},
+    {"Workspace.DefaultMap.Spawners.Uncommon",Vector3.new(341,-3,0)},
+    {"Workspace.DefaultMap_SharedInstances.Gaps.Gap2.Mud",Vector3.new(284,-9.025,0)},
+    {"Workspace.DefaultMap.Gaps.Gap2.Mud",Vector3.new(284,-9.025,0)},
+    {"Workspace.DefaultMap_SharedInstances.Floors.Rare",Vector3.new(470,-3,0)},
+    {"Workspace.DefaultMap.Spawners.Rare",Vector3.new(470,-3,0)},
+    {"Workspace.DefaultMap_SharedInstances.Gaps.Gap3.Mud",Vector3.new(398,-9.025,0)},
+    {"Workspace.DefaultMap.Gaps.Gap3.Mud",Vector3.new(398,-9.025,0)},
+    {"Workspace.DefaultMap_SharedInstances.Gaps.Gap4.Mud",Vector3.new(542,-9.025,0)},
+    {"Workspace.DefaultMap.Gaps.Gap4.Mud",Vector3.new(542,-9.025,0)},
+    {"Workspace.DefaultMap_SharedInstances.Floors.Epic",Vector3.new(649,-3,0)},
+    {"Workspace.DefaultMap.Spawners.Epic",Vector3.new(649,-3,0)},
+    {"Workspace.DefaultMap_SharedInstances.Floors.Legendary",Vector3.new(913,-3,0)},
+    {"Workspace.DefaultMap.Spawners.Legendary",Vector3.new(913,-3,0)},
+    {"Workspace.DefaultMap_SharedInstances.Gaps.Gap5.Mud",Vector3.new(756,-9.025,0)},
+    {"Workspace.DefaultMap.Gaps.Gap5.Mud",Vector3.new(756,-9.025,0)},
+    {"Workspace.DefaultMap.Spawners.Mythical",Vector3.new(1310,-3,0)},
+    {"Workspace.DefaultMap_SharedInstances.Floors.Mythical",Vector3.new(1310,-3,0)},
+    {"Workspace.DefaultMap_SharedInstances.Gaps.Gap6.Mud",Vector3.new(1074,-9.025,0)},
+    {"Workspace.DefaultMap.Gaps.Gap6.Mud",Vector3.new(1074,-9.025,0)},
+    {"Workspace.DefaultMap_SharedInstances.Gaps.Gap7.Mud",Vector3.new(1555,-9.025,0)},
+    {"Workspace.DefaultMap.Gaps.Gap7.Mud",Vector3.new(1555,-9.025,0)},
+    {"Workspace.DefaultMap_SharedInstances.Floors.Cosmic",Vector3.new(1900,-3,0)},
+    {"Workspace.DefaultMap.Spawners.Cosmic",Vector3.new(1900,-3,0)},
+    {"Workspace.DefaultMap_SharedInstances.Gaps.Gap7.Mud",Vector3.new(2252.5,-9.025,0)},
+    {"Workspace.DefaultMap.Gaps.Gap8.Mud",Vector3.new(2252.5,-9.025,0)},
+    {"Workspace.GameObjects.PlaceSpecific.root.Misc.Roof",Vector3.new(2570.5,68.5,0)},
+    {"Workspace.DefaultMap_SharedInstances.Floors.Cosmic",Vector3.new(2605,-3,0)},
+    {"Workspace.DefaultMap.Spawners.Cosmic",Vector3.new(2605,-3,0)},
+    {"Workspace.DefaultMap_SharedInstances.Gaps.Gap8.Mud",Vector3.new(2957.5,-9.025,0)},
+    {"Workspace.DefaultMap.Gaps.Gap8.Mud",Vector3.new(2957.5,-9.025,0)},
+    {"Workspace.GameObjects.PlaceSpecific.root.Misc.Roof",Vector3.new(3613.004,70.5,0)},
+    {"Workspace.DefaultMap_SharedInstances.Floors.Secret1",Vector3.new(3135,-3,0)},
+    {"Workspace.DefaultMap.Spawners.Secret",Vector3.new(3135,-3,0)},
+    {"Workspace.DefaultMap_SharedInstances.Floors.Secret2",Vector3.new(3490,-3,0)},
+    {"Workspace.DefaultMap.Spawners.Secret",Vector3.new(3490,-3,0)},
+    {"Workspace.DefaultMap_SharedInstances.Gaps.Gap8.Mud",Vector3.new(3312.5,-9.025,0)},
+    {"Workspace.DefaultMap.Gaps.Gap8.Mud",Vector3.new(3312.5,-9.025,0)},
+    {"Workspace.DefaultMap_SharedInstances.Gaps.Gap9.Mud",Vector3.new(3667.5,-9.025,0)},
+    {"Workspace.DefaultMap.Gaps.Gap9.Mud",Vector3.new(3667.5,-9.025,0)},
+    {"Workspace.DefaultMap_SharedInstances.Floors.Secret3",Vector3.new(3853,-3,0)},
+    {"Workspace.DefaultMap.Spawners.Secret",Vector3.new(3853,-3,0)},
+    {"Workspace.DefaultMap.Spawners.Celestial",Vector3.new(3845,-3,0)},
+    {"Workspace.DefaultMap_SharedInstances.Gaps.Gap9.Mud",Vector3.new(4022.5,-9.025,0)},
+    {"Workspace.DefaultMap.Gaps.Gap9.Mud",Vector3.new(4022.5,-9.025,0)},
+    {"Workspace.DefaultMap_SharedInstances.Floors.Celestial",Vector3.new(4164.5,-3,0)},
+    {"Workspace.DefaultMap.Spawners.Divine",Vector3.new(4164.5,-3,0)},
+    {"Workspace.DefaultMap.TowerGround",Vector3.new(4314.5,-3,0)},
+    {"Workspace.GameObjects.PlaceSpecific.root.Tower.Part",Vector3.new(4313.833,0.799,-2.124)},
+    {"Workspace.GameObjects.PlaceSpecific.root.Tower.Part",Vector3.new(4304.291,0.142,-1.098)},
+    {"Workspace.GameObjects.PlaceSpecific.root.Tower.Part",Vector3.new(4321.747,1.309,-2.021)},
+    {"Workspace.GameObjects.PlaceSpecific.root.Tower.Union",Vector3.new(4317.728,21.425,41.33)},
+    {"Workspace.GameObjects.PlaceSpecific.root.Tower.Part",Vector3.new(4317.728,0.16,-1.956)},
+    {"Workspace.GameObjects.PlaceSpecific.root.Tower.Union",Vector3.new(4317.728,20.527,-46.674)},
+    {"Workspace.GameObjects.PlaceSpecific.root.Misc.Ground",Vector3.new(73,-3,0)},
+    {"Workspace.MoneyMap.DefaultStudioMap.Ground",Vector3.new(73,-3,0)},
+    {"Workspace.MoneyMap.DefaultStudioMap.FirstFloor",Vector3.new(173,-3,0)},
+    {"Workspace.GameObjects.PlaceSpecific.root.Misc.Roof",Vector3.new(1182.5,68.5,0)},
+    {"Workspace.MoneyMap_SharedInstances.Floors.Common",Vector3.new(242,-3,0)},
+    {"Workspace.MoneyMap.DefaultStudioMap.Spawners.Common",Vector3.new(242,-3,0)},
+    {"Workspace.MoneyMap_SharedInstances.Floors.Uncommon",Vector3.new(341,-3,0)},
+    {"Workspace.MoneyMap.DefaultStudioMap.Spawners.Uncommon",Vector3.new(341,-3,0)},
+    {"Workspace.MoneyMap_SharedInstances.Gaps.Gap2.Mud",Vector3.new(284,-9.025,0)},
+    {"Workspace.MoneyMap.DefaultStudioMap.Gaps.Gap2.Mud",Vector3.new(284,-9.025,0)},
+    {"Workspace.MoneyMap_SharedInstances.Gaps.Gap1.Mud",Vector3.new(200,-9.025,0)},
+    {"Workspace.MoneyMap.DefaultStudioMap.Gaps.Gap1.Mud",Vector3.new(200,-9.025,0)},
+    {"Workspace.MoneyMap.DefaultStudioMap.Gaps.Gap4.Mud",Vector3.new(542,-9.025,0)},
+    {"Workspace.MoneyMap_SharedInstances.Gaps.Gap4.Mud",Vector3.new(542,-9.025,0)},
+    {"Workspace.MoneyMap_SharedInstances.Floors.Epic",Vector3.new(649,-3,0)},
+    {"Workspace.MoneyMap.DefaultStudioMap.Spawners.Rare",Vector3.new(470,-3,0)},
+    {"Workspace.MoneyMap_SharedInstances.Floors.Rare",Vector3.new(470,-3,0)},
+    {"Workspace.MoneyMap_SharedInstances.Gaps.Gap3.Mud",Vector3.new(398,-9.025,0)},
+    {"Workspace.MoneyMap.DefaultStudioMap.Gaps.Gap3.Mud",Vector3.new(398,-9.025,1)},
+    {"Workspace.MoneyMap.DefaultStudioMap.Spawners.Epic",Vector3.new(649,-3,0)},
+    {"Workspace.MoneyMap_SharedInstances.Floors.Legendary",Vector3.new(913,-3,0)},
+    {"Workspace.MoneyMap_SharedInstances.Gaps.Gap5.Mud",Vector3.new(756,-9.025,0)},
+    {"Workspace.MoneyMap.DefaultStudioMap.Gaps.Gap5.Mud",Vector3.new(756,-9.025,0)},
+    {"Workspace.MoneyMap.DefaultStudioMap.Spawners.Legendary",Vector3.new(913,-3,0)},
+    {"Workspace.MoneyMap_SharedInstances.Gaps.Gap6.Mud",Vector3.new(1074,-9.025,0)},
+    {"Workspace.MoneyMap.DefaultStudioMap.Gaps.Gap6.Mud",Vector3.new(1074,-9.025,0)},
+    {"Workspace.MoneyMap.DefaultStudioMap.Spawners.Mythical",Vector3.new(1310,-3,0)},
+    {"Workspace.MoneyMap_SharedInstances.Floors.Mythical",Vector3.new(1310,-3,0)},
+    {"Workspace.MoneyMap_SharedInstances.Gaps.Gap7.Mud",Vector3.new(1555,-9.025,0)},
+    {"Workspace.MoneyMap.DefaultStudioMap.Gaps.Gap7.Mud",Vector3.new(1555,-9.025,0)},
+    {"Workspace.MoneyMap_SharedInstances.Floors.Cosmic",Vector3.new(1900,-3,0)},
+    {"Workspace.MoneyMap.DefaultStudioMap.Spawners.Cosmic",Vector3.new(1900,-3,0)},
+    {"Workspace.MoneyMap_SharedInstances.Gaps.Gap8.Mud",Vector3.new(2252.5,-9.025,0)},
+    {"Workspace.MoneyMap.DefaultStudioMap.Gaps.Gap8.Mud",Vector3.new(2252.5,-9.025,0)},
+    {"Workspace.MoneyMap_SharedInstances.Floors.Secret",Vector3.new(2430,-3,0)},
+    {"Workspace.MoneyMap.DefaultStudioMap.Spawners.Secret",Vector3.new(2430,-3,0)},
+    {"Workspace.MoneyMap.DefaultStudioMap.Gaps.Gap9.Mud",Vector3.new(2607.5,-9.025,0)},
+    {"Workspace.MoneyMap_SharedInstances.Gaps.Gap9.Mud",Vector3.new(2607.5,-9.025,0)},
+    {"Workspace.MoneyMap.DefaultStudioMap.Spawners.Celestial",Vector3.new(2785,-3,0)},
+    {"Workspace.RadioactiveMap.Ground",Vector3.new(73,-3,0)},
+    {"Workspace.RadioactiveMap.OG.FirstFloor",Vector3.new(173,-3,0)},
+    {"Workspace.RadioactiveMap.OG.Gap1.Mud",Vector3.new(200,-9.025,0)},
+    {"Workspace.RadioactiveMap_SharedInstances.Gaps.Gap1.Mud",Vector3.new(200,-9.025,0)},
+    {"Workspace.RadioactiveMap_SharedInstances.Floors.Common",Vector3.new(242,-3,0)},
+    {"Workspace.RadioactiveMap.OG.Common",Vector3.new(242,-3,0)},
+    {"Workspace.RadioactiveMap.OG.Gap2.Mud",Vector3.new(284,-9.025,0)},
+    {"Workspace.RadioactiveMap_SharedInstances.Floors.Uncommon",Vector3.new(341,-3,0)},
+    {"Workspace.RadioactiveMap.OG.Uncommon",Vector3.new(341,-3,0)},
+    {"Workspace.RadioactiveMap.OG.Gap3.Mud",Vector3.new(398,-9.025,0)},
+    {"Workspace.RadioactiveMap_SharedInstances.Floors.Rare",Vector3.new(470,-3,0)},
+    {"Workspace.RadioactiveMap.OG.Rare",Vector3.new(470,-3,0)},
+    {"Workspace.RadioactiveMap_SharedInstances.Floors.Epic",Vector3.new(649,-3,0)},
+    {"Workspace.RadioactiveMap.OG.Epic",Vector3.new(649,-3,0)},
+    {"Workspace.RadioactiveMap_SharedInstances.Gaps.Gap4.Mud",Vector3.new(542,-9.025,0)},
+    {"Workspace.RadioactiveMap.OG.Gap4.Mud",Vector3.new(542,-9.025,0)},
+    {"Workspace.RadioactiveMap.OG.Gap5.Mud",Vector3.new(756,-9.025,0)},
+    {"Workspace.RadioactiveMap_SharedInstances.Gaps.Gap5.Mud",Vector3.new(756,-9.025,0)},
+    {"Workspace.RadioactiveMap_SharedInstances.Floors.Legendary",Vector3.new(913,-3,0)},
+    {"Workspace.RadioactiveMap.OG.Legendary",Vector3.new(913,-3,0)},
+    {"Workspace.RadioactiveMap_SharedInstances.Floors.Mythical",Vector3.new(1310,-3,0)},
+    {"Workspace.RadioactiveMap.OG.Mythical",Vector3.new(1310,-3,0)},
+    {"Workspace.RadioactiveMap.OG.Gap6.Mud",Vector3.new(1074,-9.025,-36)},
+    {"Workspace.RadioactiveMap_SharedInstances.Gaps.Gap6.Mud",Vector3.new(1074,-9.025,0)},
+    {"Workspace.RadioactiveMap.OG.Gap7.Mud",Vector3.new(1555,-9.025,0)},
+    {"Workspace.RadioactiveMap_SharedInstances.Gaps.Gap7.Mud",Vector3.new(1555,-9.025,0)},
+    {"Workspace.RadioactiveMap_SharedInstances.Floors.Cosmic",Vector3.new(1900,-3,0)},
+    {"Workspace.RadioactiveMap.OG.Cosmic",Vector3.new(1900,-3,0)},
+    {"Workspace.RadioactiveMap.OG.Gap8.Mud",Vector3.new(2252.5,-9.025,0)},
+    {"Workspace.RadioactiveMap_SharedInstances.Floors.Secret",Vector3.new(2430,-3,0)},
+    {"Workspace.RadioactiveMap.OG.Secret",Vector3.new(2430,-3,0)},
+    {"Workspace.RadioactiveMap.OG.Gap9.Mud",Vector3.new(2607.5,-9.025,0)},
+    {"Workspace.RadioactiveMap_SharedInstances.Floors.Celestial",Vector3.new(2749,-3,0)},
+    {"Workspace.RadioactiveMap.OG.Celestial",Vector3.new(2785,-3,0)},
+    {"Workspace.MarsMap.FirstFloor",Vector3.new(173,-3,0)},
+    {"Workspace.MarsMap_SharedInstances.Gaps.Gap1.Mud",Vector3.new(200,-9.025,0)},
+    {"Workspace.MarsMap.Gaps.Gap1.Mud",Vector3.new(200,-9.025,0)},
+    {"Workspace.MarsMap.Ground",Vector3.new(73,-3,0)},
+    {"Workspace.MarsMap_SharedInstances.Floors.Common",Vector3.new(242,-3,0)},
+    {"Workspace.MarsMap.Spawners.Common",Vector3.new(242,-3,0)},
+    {"Workspace.MarsMap_SharedInstances.Floors.Uncommon",Vector3.new(341,-3,0)},
+    {"Workspace.MarsMap.Spawners.Uncommon",Vector3.new(341,-3,0)},
+    {"Workspace.MarsMap_SharedInstances.Gaps.Gap2.Mud",Vector3.new(284,-9.025,0)},
+    {"Workspace.MarsMap.Gaps.Gap2.Mud",Vector3.new(284,-9.025,0)},
+    {"Workspace.MarsMap_SharedInstances.Gaps.Gap3.Mud",Vector3.new(398,-9.025,0)},
+    {"Workspace.MarsMap.Gaps.Gap3.Mud",Vector3.new(398,-9.025,0)},
+    {"Workspace.MarsMap.Spawners.Rare",Vector3.new(470,-3,0)},
+    {"Workspace.MarsMap_SharedInstances.Floors.Rare",Vector3.new(470,-3,0)},
+    {"Workspace.MarsMap.Gaps.Gap4.Mud",Vector3.new(542,-9.025,0)},
+    {"Workspace.MarsMap_SharedInstances.Floors.Epic",Vector3.new(649,-3,0)},
+    {"Workspace.MarsMap.Spawners.Epic",Vector3.new(649,-3,0)},
+    {"Workspace.MarsMap_SharedInstances.Floors.Legendary",Vector3.new(913,-3,0)},
+    {"Workspace.MarsMap.Spawners.Legendary",Vector3.new(913,-3,0)},
+    {"Workspace.MarsMap_SharedInstances.Gaps.Gap5.Mud",Vector3.new(756,-9.025,0)},
+    {"Workspace.MarsMap.Gaps.Gap5.Mud",Vector3.new(756,-9.025,0)},
+    {"Workspace.MarsMap_SharedInstances.Floors.Mythical",Vector3.new(1310,-3,0)},
+    {"Workspace.MarsMap.Spawners.Mythical",Vector3.new(1310,-3,0)},
+    {"Workspace.MarsMap_SharedInstances.Gaps.Gap6.Mud",Vector3.new(1074,-9.025,0)},
+    {"Workspace.MarsMap.Gaps.Gap6.Mud",Vector3.new(1074,-9.025,0)},
+    {"Workspace.MarsMap_SharedInstances.Gaps.Gap7.Mud",Vector3.new(1555,-9.025,0)},
+    {"Workspace.MarsMap.Gaps.Gap7.Mud",Vector3.new(1555,-9.025,0)},
+    {"Workspace.MarsMap_SharedInstances.Floors.Cosmic",Vector3.new(1900,-3,0)},
+    {"Workspace.MarsMap.Spawners.Cosmic",Vector3.new(1900,-3,0)},
+    {"Workspace.MarsMap_SharedInstances.Gaps.Gap8.Mud",Vector3.new(2252.5,-9.025,0)},
+    {"Workspace.MarsMap.Gaps.Gap7.Mud",Vector3.new(2252.5,-9.025,0)},
+    {"Workspace.MarsMap_SharedInstances.Floors.Secret",Vector3.new(2430,-3,0)},
+    {"Workspace.MarsMap.Spawners.Secret",Vector3.new(2430,-3,0)},
+    {"Workspace.MarsMap_SharedInstances.Gaps.Gap9.Mud",Vector3.new(2607.5,-9.025,0)},
+    {"Workspace.MarsMap.Gaps.Gap9.Mud",Vector3.new(2607.5,-9.025,0)},
+    {"Workspace.MarsMap_SharedInstances.Floors.Celestial",Vector3.new(2749,-3,0)},
+    {"Workspace.MarsMap.Spawners.Celestial",Vector3.new(2785,-3,0)},
+    {"Workspace.MoneyMap.DefaultStudioMap.Spawners.Mythical",Vector3.new(1137.5,-11.815,434)},
+    {"Workspace.MoneyMap.DefaultStudioMap.Spawners.Mythical",Vector3.new(1137.5,-2,434)},
+    {"Workspace.MoneyMap.DefaultStudioMap.Spawners.Mythical",Vector3.new(1124.5,7.5,533)},
+    {"Workspace.MoneyMap.DefaultStudioMap.Spawners.Mythical",Vector3.new(1132.5,14.5,533)},
+    {"Workspace.MoneyMap.DefaultStudioMap.Spawners.Mythical",Vector3.new(1140.5,7.5,533)},
+    {"Workspace.MoneyMap.DefaultStudioMap.Spawners.Mythical",Vector3.new(1132.5,-8.5,141)},
+    {"Workspace.MoneyMap.DefaultStudioMap.Spawners.Mythical",Vector3.new(1132.5,-15,159.5)},
+    {"Workspace.MoneyMap.DefaultStudioMap.Spawners.Mythical",Vector3.new(1132.5,-15,147.5)},
+    {"Workspace.MoneyMap.DefaultStudioMap.Spawners.Mythical",Vector3.new(1132.5,-3.5,131)},
+    {"Workspace.MoneyMap.DefaultStudioMap.Spawners.Mythical",Vector3.new(1132.5,-15,167.5)},
+    {"Workspace.MoneyMap.DefaultStudioMap.Spawners.Mythical",Vector3.new(1132.5,-15,178.5)},
+    {"Workspace.MoneyMap.DefaultStudioMap.Spawners.Mythical",Vector3.new(1132.5,-7.5,139)},
+    {"Workspace.MoneyMap.DefaultStudioMap.Spawners.Mythical",Vector3.new(1132.5,-4.5,133)},
+    {"Workspace.GameObjects.PlaceSpecific.root.Misc.Ground",Vector3.new(73,-3,0)},
+    {"Workspace.ArcadeMap.Ground",Vector3.new(73,-3,0)},
+    {"Workspace.ArcadeMap.FirstFloor",Vector3.new(173,-3,0)},
+    {"Workspace.ArcadeMap_SharedInstances.Gaps.Gap1.Mud",Vector3.new(200,-9.025,0)},
+    {"Workspace.ArcadeMap.Gaps.Gap1.Mud",Vector3.new(200,-9.025,0)},
+    {"Workspace.ArcadeMap.Spawners.Common",Vector3.new(242,-3,0)},
+    {"Workspace.ArcadeMap_SharedInstances.Floors.Common",Vector3.new(242,-3,0)},
+    {"Workspace.ArcadeMap_SharedInstances.Gaps.Gap2.Mud",Vector3.new(284,-9.025,0)},
+    {"Workspace.ArcadeMap.Gaps.Gap2.Mud",Vector3.new(284,-9.025,0)},
+    {"Workspace.ArcadeMap.Spawners.Uncommon",Vector3.new(341,-3,0)},
+    {"Workspace.ArcadeMap.Spawners.Rare",Vector3.new(470,-3,0)},
+    {"Workspace.ArcadeMap_SharedInstances.Floors.Rare",Vector3.new(470,-3,0)},
+    {"Workspace.ArcadeMap_SharedInstances.Gaps.Gap3.Mud",Vector3.new(398,-9.025,0)},
+    {"Workspace.ArcadeMap.Gaps.Gap3.Mud",Vector3.new(398,-9.025,0)},
+    {"Workspace.ArcadeMap.Spawners.Epic",Vector3.new(649,-3,0)},
+    {"Workspace.ArcadeMap_SharedInstances.Gaps.Gap4.Mud",Vector3.new(542,-9.025,0)},
+    {"Workspace.ArcadeMap.Gaps.Gap4.Mud",Vector3.new(542,-9.025,0)},
+    {"Workspace.ArcadeMap_SharedInstances.Floors.Epic",Vector3.new(649,-3,0)},
+    {"Workspace.ArcadeMap.Spawners.Legendary",Vector3.new(913,-3,0)},
+    {"Workspace.ArcadeMap_SharedInstances.Gaps.Gap5.Mud",Vector3.new(756,-9.025,0)},
+    {"Workspace.ArcadeMap.Gaps.Gap5.Mud",Vector3.new(756,-9.025,0)},
+    {"Workspace.ArcadeMap_SharedInstances.Floors.Legendary",Vector3.new(913,-3,0)},
+    {"Workspace.ArcadeMap_SharedInstances.Gaps.Gap6.Mud",Vector3.new(1074,-9.025,0)},
+    {"Workspace.ArcadeMap.Gaps.Gap6.Mud",Vector3.new(1074,-9.025,0)},
+    {"Workspace.ArcadeMap.Spawners.Mythical",Vector3.new(1310,-3,0)},
+    {"Workspace.ArcadeMap_SharedInstances.Gaps.Gap7.Mud",Vector3.new(1555,-9.025,0)},
+    {"Workspace.ArcadeMap.Gaps.Gap7.Mud",Vector3.new(1555,-9.025,0)},
+    {"Workspace.ArcadeMap.Spawners.Cosmic",Vector3.new(1900,-3,0)},
+    {"Workspace.ArcadeMap_SharedInstances.Floors.Cosmic",Vector3.new(1900,-3,0)},
+    {"Workspace.ArcadeMap_SharedInstances.Gaps.Gap7.Mud",Vector3.new(2252.5,-9.025,0)},
+    {"Workspace.ArcadeMap.Gaps.Gap8.Mud",Vector3.new(2252.5,-9.025,0)},
+    {"Workspace.ArcadeMap.Spawners.Cosmic",Vector3.new(2605,-3,0)},
+    {"Workspace.ArcadeMap_SharedInstances.Floors.Cosmic",Vector3.new(2605,-3,0)},
+    {"Workspace.ArcadeMap_SharedInstances.Gaps.Gap8.Mud",Vector3.new(2957.5,-9.025,0)},
+    {"Workspace.ArcadeMap.Gaps.Gap8.Mud",Vector3.new(2957.5,-9.025,0)},
+    {"Workspace.ArcadeMap.Spawners.Secret",Vector3.new(3135,-3,0)},
+    {"Workspace.ArcadeMap_SharedInstances.Floors.Secret1",Vector3.new(3135,-3,0)},
+    {"Workspace.ArcadeMap_SharedInstances.Gaps.Gap8.Mud",Vector3.new(3312.5,-9.025,0)},
+    {"Workspace.ArcadeMap.Gaps.Gap8.Mud",Vector3.new(3312.5,-9.025,0)},
+    {"Workspace.ArcadeMap.Spawners.Secret",Vector3.new(3490,-3,0)},
+    {"Workspace.ArcadeMap_SharedInstances.Gaps.Gap9.Mud",Vector3.new(3667.5,-9.025,0)},
+    {"Workspace.ArcadeMap.Gaps.Gap9.Mud",Vector3.new(3667.5,-9.025,0)},
+    {"Workspace.ArcadeMap.Spawners.Celestial",Vector3.new(3849,-3,0)},
+    {"Workspace.ArcadeMap_SharedInstances.Gaps.Gap9.Mud",Vector3.new(4022.5,-9.025,0)},
+    {"Workspace.ArcadeMap.Gaps.Gap9.Mud",Vector3.new(4022.5,-9.025,0)},
+    {"Workspace.ArcadeMap_SharedInstances.Floors.Celestial",Vector3.new(4164.5,-3,0)},
+    {"Workspace.ArcadeMap.Spawners.Divine",Vector3.new(4200,-3,0)},
+    {"Workspace.GameObjects.PlaceSpecific.root.Tower.Part",Vector3.new(4313.833,0.799,-2.124)},
+    {"Workspace.GameObjects.PlaceSpecific.root.Tower.Part",Vector3.new(4304.291,0.142,-1.098)},
+    {"Workspace.GameObjects.PlaceSpecific.root.Tower.Part",Vector3.new(4321.747,1.309,-2.021)},
+    {"Workspace.GameObjects.PlaceSpecific.root.Tower.Union",Vector3.new(4317.728,21.425,41.33)},
+    {"Workspace.GameObjects.PlaceSpecific.root.Tower.Union",Vector3.new(4317.728,20.527,-46.674)},
+    {"Workspace.DoomMap.Ground",Vector3.new(73,-3,0)},
+    {"Workspace.DoomMap.FirstFloor",Vector3.new(173,-3,0)},
+    {"Workspace.DoomMap_SharedInstances.Gaps.Gap1.Mud",Vector3.new(200,-9.025,0)},
+    {"Workspace.DoomMap.Gaps.Gap1.Mud",Vector3.new(200,-9.025,0)},
+    {"Workspace.DoomMap_SharedInstances.Floors.Common",Vector3.new(242,-3,0)},
+    {"Workspace.DoomMap.Spawners.Common",Vector3.new(242,-3,0)},
+    {"Workspace.DoomMap_SharedInstances.Gaps.Gap2.Mud",Vector3.new(284,-9.025,0)},
+    {"Workspace.DoomMap.Gaps.Gap2.Mud",Vector3.new(284,-9.025,0)},
+    {"Workspace.DoomMap_SharedInstances.Floors.Uncommon",Vector3.new(341,-3,0)},
+    {"Workspace.DoomMap.Spawners.Uncommon",Vector3.new(341,-3,0)},
+    {"Workspace.DoomMap_SharedInstances.Gaps.Gap3.Mud",Vector3.new(398,-9.025,0)},
+    {"Workspace.DoomMap.Gaps.Gap3.Mud",Vector3.new(398,-9.025,0)},
+    {"Workspace.DoomMap_SharedInstances.Floors.Rare",Vector3.new(470,-3,0)},
+    {"Workspace.DoomMap.Spawners.Rare",Vector3.new(470,-3,0)},
+    {"Workspace.DoomMap_SharedInstances.Floors.Epic",Vector3.new(649,-3,0)},
+    {"Workspace.DoomMap.Spawners.Epic",Vector3.new(649,-3,0)},
+    {"Workspace.DoomMap_SharedInstances.Gaps.Gap4.Mud",Vector3.new(542,-9.025,0)},
+    {"Workspace.DoomMap.Gaps.Gap4.Mud",Vector3.new(542,-9.025,0)},
+    {"Workspace.DoomMap.Gaps.Gap5.Mud",Vector3.new(756,-9.025,0)},
+    {"Workspace.DoomMap_SharedInstances.Floors.Legendary",Vector3.new(913,-3,0)},
+    {"Workspace.DoomMap.Spawners.Legendary",Vector3.new(913,-3,0)},
+    {"Workspace.GameObjects.PlaceSpecific.root.Misc.Roof",Vector3.new(1182.5,68.5,0)},
+    {"Workspace.DoomMap_SharedInstances.Gaps.Gap6.Mud",Vector3.new(1074,-9.025,0)},
+    {"Workspace.DoomMap.Gaps.Gap6.Mud",Vector3.new(1074,-9.025,0)},
+    {"Workspace.DoomMap.Spawners.Mythical",Vector3.new(1310,-3,0)},
+    {"Workspace.DoomMap_SharedInstances.Floors.Mythical",Vector3.new(1310,-3,0)},
+    {"Workspace.DoomMap_SharedInstances.Gaps.Gap7.Mud",Vector3.new(1555,-9.025,0)},
+    {"Workspace.DoomMap.Gaps.Gap7.Mud",Vector3.new(1555,-9.025,0)},
+    {"Workspace.DoomMap_SharedInstances.Floors.Cosmic",Vector3.new(1900,-3,0)},
+    {"Workspace.DoomMap.Spawners.Cosmic",Vector3.new(1900,-3,0)},
+    {"Workspace.DoomMap_SharedInstances.Gaps.Gap7.Mud",Vector3.new(2252.5,-9.025,0)},
+    {"Workspace.DoomMap.Gaps.Gap8.Mud",Vector3.new(2252.5,-9.025,0)},
+    {"Workspace.DoomMap_SharedInstances.Floors.Cosmic",Vector3.new(2605,-3,0)},
+    {"Workspace.DoomMap.Spawners.Cosmic",Vector3.new(2605,-3,0)},
+    {"Workspace.DoomMap_SharedInstances.Gaps.Gap8.Mud",Vector3.new(2957.5,-9.025,0)},
+    {"Workspace.DoomMap.Gaps.Gap8.Mud",Vector3.new(2957.5,-9.025,0)},
+    {"Workspace.DoomMap_SharedInstances.Floors.Secret1",Vector3.new(3135,-3,0)},
+    {"Workspace.DoomMap.Spawners.Secret",Vector3.new(3135,-3,0)},
+    {"Workspace.DoomMap_SharedInstances.Gaps.Gap8.Mud",Vector3.new(3312.5,-9.025,0)},
+    {"Workspace.DoomMap.Gaps.Gap8.Mud",Vector3.new(3312.5,-9.025,0)},
+    {"Workspace.DoomMap_SharedInstances.Floors.Secret2",Vector3.new(3490,-3,0)},
+    {"Workspace.DoomMap.Spawners.Secret",Vector3.new(3490,-3,0)},
+    {"Workspace.DoomMap.Gaps.Gap9.Mud",Vector3.new(3667.5,-9.025,0)},
+    {"Workspace.DoomMap_SharedInstances.Gaps.Gap9.Mud",Vector3.new(3667.5,-9.025,0)},
+    {"Workspace.DoomMap_SharedInstances.Floors.Secret3",Vector3.new(3853,-3,0)},
+    {"Workspace.DoomMap.Spawners.Secret",Vector3.new(3849,-3,0)},
+    {"Workspace.DoomMap_SharedInstances.Gaps.Gap9.Mud",Vector3.new(4022.5,-9.025,0)},
+    {"Workspace.DoomMap.Gaps.Gap9.Mud",Vector3.new(4022.5,-9.025,0)},
+    {"Workspace.DoomMap_SharedInstances.Floors.Celestial",Vector3.new(4164.5,-3,0)},
+    {"Workspace.DoomMap.Spawners.Divine",Vector3.new(4200,-3,0)},
+    {"Workspace.FireAndIceMap.LeftSide.LeftSide",Vector3.new(3849,-3,-66.5)},
+    {"Workspace.FireAndIceMap_SharedInstances.Floors.Secret3",Vector3.new(3853,-3,0)},
+    {"Workspace.FireAndIceMap.RightSide.RightSide",Vector3.new(3849,-3,66.5)},
+    {"Workspace.FireAndIceMap_SharedInstances.Gaps.Gap9.Mud",Vector3.new(4022.5,-9.025,0)},
+    {"Workspace.FireAndIceMap.Gaps.Gap9.Mud",Vector3.new(4022.5,-9.025,0)},
+    {"Workspace.GameObjects.PlaceSpecific.root.Misc.Roof",Vector3.new(3613.004,70.5,0)},
+    {"Workspace.FireAndIceMap.RightSide.RightSide",Vector3.new(4164.5,-3,66.5)},
+    {"Workspace.FireAndIceMap_SharedInstances.Floors.Celestial",Vector3.new(4164.5,-3,0)},
+    {"Workspace.FireAndIceMap.RightSide.RightSide",Vector3.new(4117,-3,2)},
+    {"Workspace.FireAndIceMap.LeftSide.LeftSide",Vector3.new(4164.5,-3,-66.5)},
+    {"Workspace.FireAndIceMap.TowerGround",Vector3.new(4314.5,-3,65)},
+    {"Workspace.FireAndIceMap.TowerGround",Vector3.new(4314.5,-3,-65)},
+    {"Workspace.FireAndIceMap_SharedInstances.Gaps.Gap9.Mud",Vector3.new(3667.5,-9.025,0)},
+    {"Workspace.FireAndIceMap.Gaps.Gap9.Mud",Vector3.new(3667.5,-9.025,0)},
+    {"Workspace.FireAndIceMap.RightSide.RightSide",Vector3.new(3490,-3,66.5)},
+    {"Workspace.FireAndIceMap.LeftSide.LeftSide",Vector3.new(3490,-3,-66.5)},
+    {"Workspace.FireAndIceMap_SharedInstances.Floors.Secret2",Vector3.new(3490,-3,0)},
+    {"Workspace.FireAndIceMap_SharedInstances.Gaps.Gap8.Mud",Vector3.new(3312.5,-9.025,0)},
+    {"Workspace.FireAndIceMap.Gaps.Gap8.Mud",Vector3.new(3312.5,-9.025,0)},
+    {"Workspace.FireAndIceMap.LeftSide.LeftSide",Vector3.new(3135,-3,-66.5)},
+    {"Workspace.FireAndIceMap.RightSide.RightSide",Vector3.new(3135,-3,66.5)},
+    {"Workspace.FireAndIceMap.LeftSide.LeftSide",Vector3.new(2605,-3,-66.5)},
+    {"Workspace.FireAndIceMap_SharedInstances.Floors.Cosmic",Vector3.new(2605,-3,0)},
+    {"Workspace.FireAndIceMap.RightSide.RightSide",Vector3.new(2907.5,-3,2)},
+    {"Workspace.FireAndIceMap.RightSide.RightSide",Vector3.new(2605,-3,66.5)},
+    {"Workspace.FireAndIceMap_SharedInstances.Gaps.Gap8.Mud",Vector3.new(2957.5,-9.025,0)},
+    {"Workspace.FireAndIceMap.Gaps.Gap8.Mud",Vector3.new(2957.5,-9.025,0)},
+    {"Workspace.FireAndIceMap_SharedInstances.Gaps.Gap7.Mud",Vector3.new(2252.5,-9.025,0)},
+    {"Workspace.FireAndIceMap.Gaps.Gap8.Mud",Vector3.new(2252.5,-9.025,0)},
+    {"Workspace.FireAndIceMap.RightSide.RightSide",Vector3.new(1900,-3,66.5)},
+    {"Workspace.FireAndIceMap_SharedInstances.Floors.Cosmic",Vector3.new(1900,-3,0)},
+    {"Workspace.FireAndIceMap.RightSide.RightSide",Vector3.new(2189,-3,2)},
+    {"Workspace.FireAndIceMap.LeftSide.LeftSide",Vector3.new(1900,-3,-66.5)},
+    {"Workspace.FireAndIceMap_SharedInstances.Gaps.Gap7.Mud",Vector3.new(1555,-9.025,0)},
+    {"Workspace.FireAndIceMap.Gaps.Gap7.Mud",Vector3.new(1555,-9.025,0)},
+    {"Workspace.FireAndIceMap.LeftSide.LeftSide",Vector3.new(1310,-3,-66.5)},
+    {"Workspace.FireAndIceMap_SharedInstances.Floors.Mythical",Vector3.new(1310,-3,0)},
+    {"Workspace.FireAndIceMap.RightSide.RightSide",Vector3.new(1310,-3,66.5)},
+    {"Workspace.FireAndIceMap.LeftSide.LeftSide",Vector3.new(913,-3,-66.5)},
+    {"Workspace.FireAndIceMap_SharedInstances.Floors.Legendary",Vector3.new(913,-3,0)},
+    {"Workspace.FireAndIceMap_SharedInstances.Gaps.Gap6.Mud",Vector3.new(1074,-9.025,0)},
+    {"Workspace.FireAndIceMap.Gaps.Gap6.Mud",Vector3.new(1074,-9.025,0)},
+    {"Workspace.FireAndIceMap.RightSide.RightSide",Vector3.new(913,-3,66.5)},
+    {"Workspace.FireAndIceMap_SharedInstances.Gaps.Gap5.Mud",Vector3.new(756,-9.025,0)},
+    {"Workspace.FireAndIceMap.Gaps.Gap5.Mud",Vector3.new(756,-9.025,-1)},
+    {"Workspace.FireAndIceMap.LeftSide.LeftSide",Vector3.new(649,-3,-66.5)},
+    {"Workspace.FireAndIceMap_SharedInstances.Floors.Epic",Vector3.new(649,-3,0)},
+    {"Workspace.FireAndIceMap.RightSide.RightSide",Vector3.new(649,-3,66.5)},
+    {"Workspace.FireAndIceMap_SharedInstances.Gaps.Gap4.Mud",Vector3.new(542,-9.025,0)},
+    {"Workspace.FireAndIceMap.Gaps.Gap4.Mud",Vector3.new(542,-9.025,0)},
+    {"Workspace.FireAndIceMap_SharedInstances.Floors.Rare",Vector3.new(470,-3,0)},
+    {"Workspace.FireAndIceMap.RightSide.RightSide",Vector3.new(470,-3,66.5)},
+    {"Workspace.FireAndIceMap.LeftSide.LeftSide",Vector3.new(470,-3,-66.5)},
+    {"Workspace.FireAndIceMap.LeftSide.LeftSide",Vector3.new(341,-3,-66.5)},
+    {"Workspace.FireAndIceMap_SharedInstances.Floors.Uncommon",Vector3.new(341,-3,0)},
+    {"Workspace.FireAndIceMap_SharedInstances.Gaps.Gap3.Mud",Vector3.new(398,-9.025,0)},
+    {"Workspace.FireAndIceMap.Gaps.Gap3.Mud",Vector3.new(398,-9.025,0)},
+    {"Workspace.FireAndIceMap.RightSide.RightSide",Vector3.new(341,-3,66.5)},
+    {"Workspace.FireAndIceMap.RightSide.RightSide",Vector3.new(242,-3,66.5)},
+    {"Workspace.FireAndIceMap_SharedInstances.Floors.Common",Vector3.new(242,-3,0)},
+    {"Workspace.FireAndIceMap_SharedInstances.Gaps.Gap2.Mud",Vector3.new(284,-9.025,0)},
+    {"Workspace.FireAndIceMap.Gaps.Gap2.Mud",Vector3.new(284,-9.025,0)},
+    {"Workspace.FireAndIceMap.LeftSide.LeftSide",Vector3.new(242,-3,-66.5)},
+    {"Workspace.FireAndIceMap_SharedInstances.Gaps.Gap1.Mud",Vector3.new(200,-9.025,0)},
+    {"Workspace.FireAndIceMap.Gaps.Gap1.Mud",Vector3.new(200,-9.025,0)},
+    {"Workspace.FireAndIceMap.FirstFloor",Vector3.new(173,-3,-66.5)},
+    {"Workspace.FireAndIceMap.FirstFloor",Vector3.new(173,-3,66)},
+    {"Workspace.FireAndIceMap.Ground",Vector3.new(73,-3,0)},
+    {"Workspace.FireAndIceMap.LeftSide.LeftSide",Vector3.new(294,-3,-2)},
+    {"Workspace.FireAndIceMap.LeftSide.LeftSide",Vector3.new(293.5,-3,0)},
+    {"Workspace.FireAndIceMap.LeftSide.LeftSide",Vector3.new(302,-3,-1.5)},
+    {"Workspace.FireAndIceMap.LeftSide.LeftSide",Vector3.new(299.5,-3,-2)},
+    {"Workspace.FireAndIceMap.RightSide.RightSide",Vector3.new(298.5,-3,0)},
 }
 
--- Partes nuevas a agregar (se destruyen al desactivar Remove)
 local MAP_ADDED = {
     -- 1
     {pos=Vector3.new(60.10002899169922,-0.5999994277954102,9.700004577636719), size=Vector3.new(186,0.5,405), color=Color3.fromRGB(80,180,80), mat=Enum.Material.Pebble},
@@ -193,74 +423,50 @@ local MAP_ADDED = {
     {pos=Vector3.new(4309.5966796875,-2,92.60003662109375), size=Vector3.new(10,176,80), color=Color3.fromRGB(15,15,15), mat=Enum.Material.Pebble},
 }
 
--- Tabla para guardar referencias: partes originales ocultas y partes nuevas creadas
-local hiddenOriginals = {} -- {part, originalTransparency, originalCanCollide}
-local addedParts      = {} -- instancias Part creadas por Remove
+local hiddenOriginals  = {}
+local addedParts       = {}
 
--- ══════════════════════════════════════
---  HELPER: buscar parte por path + posición
---  Necesario porque hay múltiples objetos
---  con el mismo path exacto:
---    - Roof               x3
---    - Gap7.Mud           x2
---    - Floors.Cosmic      x2
---    - Spawners.Cosmic    x2
---    - Gap8.Mud           x2/x3
---    - Spawners.Secret    x3
---    - Gap9.Mud           x2
---    - Tower.Part         x4
---    - Tower.Union        x2
---  FindFirstChild solo devuelve el primero,
---  así que buscamos TODOS y elegimos el
---  más cercano a la posición del JSON.
--- ══════════════════════════════════════
-local POS_TOLERANCE = 5 -- studs de margen
+-- =============================================
+--  HELPER: buscar parte por path + posicion
+-- =============================================
+local POS_TOLERANCE = 5
 
 local function getByPathAndPos(pathStr, expectedPos)
     local segments = {}
     for seg in pathStr:gmatch("[^%.]+") do
         table.insert(segments, seg)
     end
-
-    -- Navegar hasta el contenedor padre
     local current = game
     for i = 1, #segments - 1 do
         local child = current:FindFirstChild(segments[i])
         if not child then return nil end
         current = child
     end
-
     local lastName = segments[#segments]
-
-    -- Recoger TODOS los hijos con ese nombre
     local candidates = {}
     for _, child in ipairs(current:GetChildren()) do
         if child.Name == lastName then
             table.insert(candidates, child)
         end
     end
-
     if #candidates == 0 then return nil end
     if #candidates == 1 then return candidates[1] end
-
-    -- Hay varios: elegir el BasePart más cercano a expectedPos
-    local best     = nil
-    local bestDist = math.huge
+    local best, bestDist = nil, math.huge
     for _, child in ipairs(candidates) do
         if child:IsA("BasePart") then
             local dist = (child.Position - expectedPos).Magnitude
             if dist < bestDist then
                 bestDist = dist
-                best     = child
+                best = child
             end
         end
     end
     return best or candidates[1]
 end
 
--- ══════════════════════════════════════
+-- =============================================
 --  HELPER: suelo real con Raycast
--- ══════════════════════════════════════
+-- =============================================
 local function getGroundY(pos, character)
     local rayParams = RaycastParams.new()
     rayParams.FilterType = Enum.RaycastFilterType.Exclude
@@ -282,9 +488,9 @@ local function getGroundY(pos, character)
     return bestY or (godData and godData.surfaceY or pos.Y)
 end
 
--- ══════════════════════════════════════
---  GOD MODE: ACTIVAR
--- ══════════════════════════════════════
+-- =============================================
+--  GOD MODE
+-- =============================================
 local function activate()
     local char = lp.Character
     if not char then return end
@@ -313,14 +519,13 @@ local function activate()
     cam.CameraSubject = fakePart
 
     local FLY_SPEED = 800
-
     local bv = Instance.new("BodyVelocity")
-    bv.MaxForce = Vector3.new(1e5, 1e5, 1e5)
-    bv.Velocity  = Vector3.new(0, 0, 0)
+    bv.MaxForce = Vector3.new(1e5,1e5,1e5)
+    bv.Velocity  = Vector3.new(0,0,0)
     bv.Parent    = root
 
     local bg = Instance.new("BodyGyro")
-    bg.MaxTorque = Vector3.new(1e5, 1e5, 1e5)
+    bg.MaxTorque = Vector3.new(1e5,1e5,1e5)
     bg.P         = 1e4
     bg.CFrame    = root.CFrame
     bg.Parent    = root
@@ -331,29 +536,23 @@ local function activate()
         local r = c:FindFirstChild("HumanoidRootPart")
         local h = c:FindFirstChildOfClass("Humanoid")
         if not r or not h then return end
-
         local yawNow = select(2, r.CFrame:ToEulerAnglesYXZ())
         r.CFrame = CFrame.new(r.Position.X, targetY, r.Position.Z) * CFrame.Angles(0, yawNow, 0)
-
         local move = h.MoveDirection
-
         if move.Magnitude > 0.1 then
             local camLook = cam.CFrame.LookVector
             local forward = Vector3.new(camLook.X, 0, camLook.Z).Unit
             local right   = Vector3.new(camLook.Z, 0, -camLook.X).Unit
-
-            local dot_f = Vector3.new(move.X, 0, move.Z):Dot(forward)
-            local dot_r = Vector3.new(move.X, 0, move.Z):Dot(right)
+            local dot_f = Vector3.new(move.X,0,move.Z):Dot(forward)
+            local dot_r = Vector3.new(move.X,0,move.Z):Dot(right)
             if forward.Magnitude < 0.01 then dot_f = 0 end
             local dir = (forward * dot_f + right * dot_r)
             if dir.Magnitude > 0 then dir = dir.Unit end
-
             bv.Velocity = dir * FLY_SPEED
             bg.CFrame   = CFrame.new(r.Position, r.Position + dir)
         else
-            bv.Velocity = Vector3.new(0, 0, 0)
+            bv.Velocity = Vector3.new(0,0,0)
         end
-
         fakePart.Position = Vector3.new(r.Position.X, surfaceY+CAM_HEIGHT, r.Position.Z)
     end)
 
@@ -361,9 +560,6 @@ local function activate()
     godData.bg = bg
 end
 
--- ══════════════════════════════════════
---  GOD MODE: DESACTIVAR
--- ══════════════════════════════════════
 local function deactivate()
     if heartbeat then heartbeat:Disconnect(); heartbeat = nil end
     if fakePart  then fakePart:Destroy();    fakePart  = nil  end
@@ -371,12 +567,10 @@ local function deactivate()
         if godData.bv and godData.bv.Parent then godData.bv:Destroy() end
         if godData.bg and godData.bg.Parent then godData.bg:Destroy() end
     end
-
     cam.CameraType = Enum.CameraType.Custom
     local char = lp.Character
     local hum  = char and char:FindFirstChildOfClass("Humanoid")
     if hum then cam.CameraSubject = hum end
-
     local root = char and char:FindFirstChild("HumanoidRootPart")
     if root then
         local safeY = getGroundY(root.Position, char) + 3
@@ -398,18 +592,9 @@ local function resetOnDeath()
     godActive = false
     cam.CameraType = Enum.CameraType.Custom
     autoBrainActive = false
-    if autoBrainThread then
-        task.cancel(autoBrainThread)
-        autoBrainThread = nil
-    end
-    if BtnGod then
-        BtnGod.Text             = "⚡ God Mode"
-        BtnGod.BackgroundColor3 = Color3.fromRGB(20, 50, 20)
-    end
-    if BtnAuto then
-        BtnAuto.Text             = "🧠 Auto Brain"
-        BtnAuto.BackgroundColor3 = Color3.fromRGB(30, 20, 55)
-    end
+    if autoBrainThread then task.cancel(autoBrainThread); autoBrainThread = nil end
+    if BtnGod  then BtnGod.Text  = "God Mode";   BtnGod.BackgroundColor3  = Color3.fromRGB(20,50,20) end
+    if BtnAuto then BtnAuto.Text = "Auto Brain"; BtnAuto.BackgroundColor3 = Color3.fromRGB(30,20,55) end
 end
 
 lp.CharacterAdded:Connect(function(char)
@@ -420,35 +605,29 @@ lp.CharacterAdded:Connect(function(char)
         hum.Died:Connect(resetOnDeath)
     end
 end)
-
 local currentChar = lp.Character
 if currentChar then
     local hum = currentChar:FindFirstChildOfClass("Humanoid")
     if hum then hum.Died:Connect(resetOnDeath) end
 end
 
--- ══════════════════════════════════════
---  INSTANT PICKUP — SIEMPRE ACTIVO
--- ══════════════════════════════════════
+-- =============================================
+--  INSTANT PICKUP
+-- =============================================
 local originalDurations = {}
 
 local function isPickupPrompt(prompt)
     if not prompt:IsA("ProximityPrompt") then return false end
     if prompt.HoldDuration <= 0 then return false end
-
     local ancestor = prompt.Parent
     while ancestor and ancestor ~= workspace do
         if ancestor:IsA("Model") then
-            if ancestor:HasTag("Brainrot") or ancestor:HasTag("HoldingLuckyBlock") then
-                return true
-            end
+            if ancestor:HasTag("Brainrot") or ancestor:HasTag("HoldingLuckyBlock") then return true end
         end
         ancestor = ancestor.Parent
     end
-
     local actionLower = prompt.ActionText:lower()
-    local keywords = {"pick","toma","take","coger","collect","cobrar","place","coloca","poner","sell","vend"}
-    for _, kw in ipairs(keywords) do
+    for _, kw in ipairs({"pick","toma","take","coger","collect","cobrar","place","coloca","poner","sell","vend"}) do
         if actionLower:find(kw) then return true end
     end
     return false
@@ -465,51 +644,35 @@ local function applyInstant(prompt)
 end
 
 workspace.DescendantRemoving:Connect(function(obj)
-    if obj:IsA("ProximityPrompt") then
-        originalDurations[obj] = nil
-    end
+    if obj:IsA("ProximityPrompt") then originalDurations[obj] = nil end
 end)
-
-for _, obj in ipairs(workspace:GetDescendants()) do
-    applyInstant(obj)
-end
-
-workspace.DescendantAdded:Connect(function(obj)
-    task.defer(function() applyInstant(obj) end)
-end)
-
+for _, obj in ipairs(workspace:GetDescendants()) do applyInstant(obj) end
+workspace.DescendantAdded:Connect(function(obj) task.defer(function() applyInstant(obj) end) end)
 task.spawn(function()
     while true do
         task.wait(2)
-        for _, obj in ipairs(workspace:GetDescendants()) do
-            applyInstant(obj)
-        end
+        for _, obj in ipairs(workspace:GetDescendants()) do applyInstant(obj) end
     end
 end)
 
--- ══════════════════════════════════════
+-- =============================================
 --  AUTO BRAIN
--- ══════════════════════════════════════
+-- =============================================
 local AUTO_RANGE    = 8
 local AUTO_INTERVAL = 0.05
 local trackedPrompts = {}
 
 local function isBrainrotPrompt(prompt)
     if not prompt:IsA("ProximityPrompt") then return false end
-
     local ancestor = prompt.Parent
     while ancestor and ancestor ~= workspace do
         if ancestor:IsA("Model") then
-            if ancestor:HasTag("Brainrot") or ancestor:HasTag("HoldingLuckyBlock") then
-                return true
-            end
+            if ancestor:HasTag("Brainrot") or ancestor:HasTag("HoldingLuckyBlock") then return true end
         end
         ancestor = ancestor.Parent
     end
-
     local actionLower = prompt.ActionText:lower()
-    local keywords = {"pick","toma","take","coger","collect","cobrar","brainrot"}
-    for _, kw in ipairs(keywords) do
+    for _, kw in ipairs({"pick","toma","take","coger","collect","cobrar","brainrot"}) do
         if actionLower:find(kw) then return true end
     end
     return false
@@ -518,16 +681,10 @@ end
 for _, obj in ipairs(workspace:GetDescendants()) do
     if isBrainrotPrompt(obj) then trackedPrompts[obj] = true end
 end
-
 workspace.DescendantAdded:Connect(function(obj)
-    task.defer(function()
-        if isBrainrotPrompt(obj) then trackedPrompts[obj] = true end
-    end)
+    task.defer(function() if isBrainrotPrompt(obj) then trackedPrompts[obj] = true end end)
 end)
-
-workspace.DescendantRemoving:Connect(function(obj)
-    trackedPrompts[obj] = nil
-end)
+workspace.DescendantRemoving:Connect(function(obj) trackedPrompts[obj] = nil end)
 
 local function getPromptPosition(prompt)
     local part = prompt.Parent
@@ -543,7 +700,7 @@ end
 local function firePrompt(prompt)
     prompt.HoldDuration = 0
     prompt.Enabled = true
-    if fireproximityprompt then pcall(fireproximityprompt, prompt) end
+    if fireproximityprompt  then pcall(fireproximityprompt, prompt) end
     if triggerproximityprompt then pcall(triggerproximityprompt, prompt) end
     pcall(function() prompt.Triggered:Fire(lp) end)
 end
@@ -592,33 +749,24 @@ local function stopAutoBrain()
     if autoBrainThread then task.cancel(autoBrainThread); autoBrainThread = nil end
 end
 
--- ══════════════════════════════════════
---  REMOVE MAP: ACTIVAR
---  1. Oculta + desactiva colisión de las
---     partes del mapa original (deleted)
---  2. Crea e inserta las partes nuevas
---     (added) en el workspace
--- ══════════════════════════════════════
+-- =============================================
+--  REMOVE MAP
+-- =============================================
 local function activateRemove()
     hiddenOriginals = {}
     addedParts      = {}
-
-    -- Paso 1: ocultar originales buscando por path + posición
-    -- (usa posición para distinguir duplicados con el mismo path)
     for _, entry in ipairs(MAP_DELETED) do
-        local obj = getByPathAndPos(entry.path, entry.pos)
+        local obj = getByPathAndPos(entry[1], entry[2])
         if obj and obj:IsA("BasePart") then
             table.insert(hiddenOriginals, {
-                part              = obj,
-                origTransparency  = obj.Transparency,
-                origCanCollide    = obj.CanCollide,
+                part             = obj,
+                origTransparency = obj.Transparency,
+                origCanCollide   = obj.CanCollide,
             })
             obj.Transparency = 1
             obj.CanCollide   = false
         end
     end
-
-    -- Paso 2: crear partes nuevas
     for i, entry in ipairs(MAP_ADDED) do
         local p = Instance.new("Part")
         p.Name         = "__RozekAdded_" .. i .. "__"
@@ -632,43 +780,28 @@ local function activateRemove()
         p.Parent       = workspace
         table.insert(addedParts, p)
     end
-
-    print("[Rozek v3] Remove Map ON — " .. #hiddenOriginals .. " partes ocultas, " .. #addedParts .. " partes añadidas")
+    print("[Rozek v4] Remove Map ON - " .. #hiddenOriginals .. " ocultas, " .. #addedParts .. " agregadas")
 end
 
--- ══════════════════════════════════════
---  REMOVE MAP: DESACTIVAR
---  1. Restaura visibilidad y colisión
---     de las partes originales
---  2. Destruye las partes añadidas
--- ══════════════════════════════════════
 local function deactivateRemove()
-    -- Restaurar originales
     for _, entry in ipairs(hiddenOriginals) do
         if entry.part and entry.part.Parent then
             entry.part.Transparency = entry.origTransparency
             entry.part.CanCollide   = entry.origCanCollide
         end
     end
-
-    -- Destruir partes añadidas
     for _, p in ipairs(addedParts) do
-        if p and p.Parent then
-            p:Destroy()
-        end
+        if p and p.Parent then p:Destroy() end
     end
-
     hiddenOriginals = {}
     addedParts      = {}
-
-    print("[Rozek v3] Remove Map OFF — mapa restaurado")
+    print("[Rozek v4] Remove Map OFF")
 end
 
--- ══════════════════════════════════════
---  GUI — Rozek v3
--- ══════════════════════════════════════
+-- =============================================
+--  GUI
+-- =============================================
 repeat task.wait() until lp.PlayerGui
-
 pcall(function()
     if lp.PlayerGui:FindFirstChild("__Rozek__") then
         lp.PlayerGui.__Rozek__:Destroy()
@@ -681,9 +814,8 @@ GUI.ResetOnSpawn = false
 GUI.DisplayOrder = 10
 GUI.Parent       = lp.PlayerGui
 
--- Frame principal — más alto para 3 filas (TitleBar 22 + Fila1 28 + Fila2 28 + padding)
-local FRAME_W = 170
-local FRAME_H = 92  -- 22 title + 28 fila1 + 28 fila2 + 14 gaps/padding
+local FRAME_W = 180
+local FRAME_H = 148  -- title 22 + fila1 28 + fila2 28 + fila3 28 + status 24 + gaps
 
 local Frame = Instance.new("Frame")
 Frame.Size             = UDim2.new(0, FRAME_W, 0, FRAME_H)
@@ -699,14 +831,13 @@ outerStroke.Color        = Color3.fromRGB(60, 60, 90)
 outerStroke.Thickness    = 1
 outerStroke.Transparency = 0.4
 
--- TitleBar (drag zone)
+-- TitleBar
 local TitleBar = Instance.new("Frame")
 TitleBar.Size             = UDim2.new(1, 0, 0, 22)
 TitleBar.BackgroundColor3 = Color3.fromRGB(15, 15, 22)
 TitleBar.BorderSizePixel  = 0
 TitleBar.Parent           = Frame
 Instance.new("UICorner", TitleBar).CornerRadius = UDim.new(0, 10)
-
 local TitlePatch = Instance.new("Frame")
 TitlePatch.Size             = UDim2.new(1, 0, 0, 10)
 TitlePatch.Position         = UDim2.new(0, 0, 1, -10)
@@ -716,13 +847,12 @@ TitlePatch.Parent           = TitleBar
 
 local Title = Instance.new("TextLabel")
 Title.Size               = UDim2.new(1, 0, 1, 0)
-Title.Position           = UDim2.new(0, 0, 0, 0)
 Title.BackgroundTransparency = 1
 Title.TextColor3         = Color3.fromRGB(220, 220, 255)
 Title.Font               = Enum.Font.GothamBold
 Title.TextSize           = 11
 Title.TextXAlignment     = Enum.TextXAlignment.Center
-Title.Text               = "✦ Rozek"
+Title.Text               = "Rozek v4"
 Title.Parent             = TitleBar
 
 local StatusDot = Instance.new("Frame")
@@ -741,105 +871,84 @@ local function updateDot()
     end
 end
 
--- ── FILA 1: God Mode + Auto Brain ─────────────────────
-local Row1 = Instance.new("Frame")
-Row1.Size             = UDim2.new(1, -10, 0, 28)
-Row1.Position         = UDim2.new(0, 5, 0, 26)
-Row1.BackgroundTransparency = 1
-Row1.Parent           = Frame
-
-local RowLayout1 = Instance.new("UIListLayout", Row1)
-RowLayout1.FillDirection = Enum.FillDirection.Horizontal
-RowLayout1.SortOrder     = Enum.SortOrder.LayoutOrder
-RowLayout1.Padding       = UDim.new(0, 6)
-
--- ── FILA 2: Remove Map (centrado) ─────────────────────
-local Row2 = Instance.new("Frame")
-Row2.Size             = UDim2.new(1, -10, 0, 28)
-Row2.Position         = UDim2.new(0, 5, 0, 58)
-Row2.BackgroundTransparency = 1
-Row2.Parent           = Frame
-
-local RowLayout2 = Instance.new("UIListLayout", Row2)
-RowLayout2.FillDirection      = Enum.FillDirection.Horizontal
-RowLayout2.SortOrder          = Enum.SortOrder.LayoutOrder
-RowLayout2.HorizontalAlignment = Enum.HorizontalAlignment.Center
-
--- ── Helper para crear botones ─────────────────────────
-local function makeBtn(parent, text, bgColor, order, fullWidth)
+-- Helper boton
+local function makeBtn(parent, text, bgColor, w, h, x, y)
     local btn = Instance.new("TextButton")
-    if fullWidth then
-        btn.Size = UDim2.new(1, 0, 1, 0)
-    else
-        btn.Size = UDim2.new(0.5, -3, 1, 0)
-    end
+    btn.Size             = UDim2.new(0, w, 0, h)
+    btn.Position         = UDim2.new(0, x, 0, y)
     btn.BackgroundColor3 = bgColor
     btn.TextColor3       = Color3.fromRGB(255, 255, 255)
     btn.Font             = Enum.Font.GothamBold
     btn.TextSize         = 10
     btn.Text             = text
     btn.BorderSizePixel  = 0
-    btn.LayoutOrder      = order
     btn.Parent           = parent
     Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 7)
     return btn
 end
 
--- Botones fila 1
-BtnGod  = makeBtn(Row1, "⚡ God Mode",   Color3.fromRGB(18, 40, 18), 1, false)
-BtnAuto = makeBtn(Row1, "🧠 Auto Brain", Color3.fromRGB(22, 16, 40), 2, false)
+local BW = 82  -- ancho boton
+local BH = 26  -- alto boton
+local PX = 8   -- padding x
+local PY = 26  -- start y (despues del title)
+local GAP = 6  -- gap entre botones
 
--- Botón fila 2 (ancho completo)
-BtnRemove = makeBtn(Row2, "🗺️ Remove Map", Color3.fromRGB(50, 28, 10), 1, true)
+-- Fila 1: God Mode | Auto Brain
+BtnGod  = makeBtn(Frame, "God Mode",   Color3.fromRGB(18,40,18),  BW, BH, PX,        PY+4)
+BtnAuto = makeBtn(Frame, "Auto Brain", Color3.fromRGB(30,20,55),  BW, BH, PX+BW+GAP, PY+4)
 
--- ── Lógica botón God Mode ─────────────────────────────
+-- Fila 2: Remove Map (ancho completo)
+BtnRemove = makeBtn(Frame, "Remove Map", Color3.fromRGB(50,28,10), FRAME_W-PX*2, BH, PX, PY+4+BH+GAP)
+
+-- Ajustar alto total del frame
+Frame.Size = UDim2.new(0, FRAME_W, 0, PY+4+BH*2+GAP*2+8)
+
+-- -- Logica botones --------------------------------
 BtnGod.Activated:Connect(function()
     godActive = not godActive
     if godActive then
         activate()
-        BtnGod.Text             = "🛑 God OFF"
-        BtnGod.BackgroundColor3 = Color3.fromRGB(55, 10, 10)
+        BtnGod.Text             = "God OFF"
+        BtnGod.BackgroundColor3 = Color3.fromRGB(55,10,10)
     else
         deactivate()
-        BtnGod.Text             = "⚡ God Mode"
-        BtnGod.BackgroundColor3 = Color3.fromRGB(18, 40, 18)
+        BtnGod.Text             = "God Mode"
+        BtnGod.BackgroundColor3 = Color3.fromRGB(18,40,18)
     end
     updateDot()
 end)
 
--- ── Lógica botón Auto Brain ───────────────────────────
 BtnAuto.Activated:Connect(function()
     autoBrainActive = not autoBrainActive
     if autoBrainActive then
-        BtnAuto.Text             = "🛑 Auto OFF"
-        BtnAuto.BackgroundColor3 = Color3.fromRGB(55, 10, 10)
+        BtnAuto.Text             = "Auto OFF"
+        BtnAuto.BackgroundColor3 = Color3.fromRGB(55,10,10)
         startAutoBrain()
     else
         stopAutoBrain()
-        BtnAuto.Text             = "🧠 Auto Brain"
-        BtnAuto.BackgroundColor3 = Color3.fromRGB(22, 16, 40)
+        BtnAuto.Text             = "Auto Brain"
+        BtnAuto.BackgroundColor3 = Color3.fromRGB(30,20,55)
     end
     updateDot()
 end)
 
--- ── Lógica botón Remove Map ───────────────────────────
 BtnRemove.Activated:Connect(function()
     removeActive = not removeActive
     if removeActive then
         activateRemove()
-        BtnRemove.Text             = "🛑 Remove OFF"
-        BtnRemove.BackgroundColor3 = Color3.fromRGB(55, 10, 10)
+        BtnRemove.Text             = "Remove OFF"
+        BtnRemove.BackgroundColor3 = Color3.fromRGB(55,10,10)
     else
         deactivateRemove()
-        BtnRemove.Text             = "🗺️ Remove Map"
-        BtnRemove.BackgroundColor3 = Color3.fromRGB(50, 28, 10)
+        BtnRemove.Text             = "Remove Map"
+        BtnRemove.BackgroundColor3 = Color3.fromRGB(50,28,10)
     end
     updateDot()
 end)
 
--- ══════════════════════════════════════
---  DRAG — táctil y mouse
--- ══════════════════════════════════════
+-- =============================================
+--  DRAG
+-- =============================================
 local dragging   = false
 local dragStart  = Vector2.new()
 local panelStart = Vector2.new()
@@ -852,7 +961,6 @@ TitleBar.InputBegan:Connect(function(input)
         panelStart = Vector2.new(Frame.Position.X.Offset, Frame.Position.Y.Offset)
     end
 end)
-
 UIS.InputChanged:Connect(function(input)
     if not dragging then return end
     if input.UserInputType ~= Enum.UserInputType.MouseMovement
@@ -863,7 +971,6 @@ UIS.InputChanged:Connect(function(input)
     local ny = math.clamp(panelStart.Y + delta.Y, 0, vp.Y - Frame.AbsoluteSize.Y)
     Frame.Position = UDim2.new(0, nx, 0, ny)
 end)
-
 UIS.InputEnded:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1
     or input.UserInputType == Enum.UserInputType.Touch then
@@ -871,36 +978,29 @@ UIS.InputEnded:Connect(function(input)
     end
 end)
 
--- ══════════════════════════════════════
---  RAINBOW — título y botones inactivos
--- ══════════════════════════════════════
+-- =============================================
+--  RAINBOW
+-- =============================================
 local rainbowHue = 0
 RS.Heartbeat:Connect(function(dt)
     rainbowHue = (rainbowHue + dt * 0.4) % 1
-
     local c1 = Color3.fromHSV(rainbowHue % 1,          0.85, 1)
     local c2 = Color3.fromHSV((rainbowHue + 0.5)  % 1, 0.85, 1)
     local c3 = Color3.fromHSV((rainbowHue + 0.33) % 1, 0.85, 1)
     local ct = Color3.fromHSV((rainbowHue + 0.25) % 1, 0.7,  1)
-
-    -- Título siempre rainbow
     Title.TextColor3 = ct
-
-    -- Botones solo si están inactivos
     if BtnGod    and not godActive       then BtnGod.TextColor3    = c1 end
     if BtnAuto   and not autoBrainActive then BtnAuto.TextColor3   = c2 end
     if BtnRemove and not removeActive    then BtnRemove.TextColor3 = c3 end
 end)
 
--- ══════════════════════════════════════
---  INFINITE JUMP — SIEMPRE ACTIVO
--- ══════════════════════════════════════
+-- =============================================
+--  INFINITE JUMP
+-- =============================================
 UIS.JumpRequest:Connect(function()
     local char = lp.Character
     local hum  = char and char:FindFirstChildOfClass("Humanoid")
-    if hum then
-        hum:ChangeState(Enum.HumanoidStateType.Jumping)
-    end
+    if hum then hum:ChangeState(Enum.HumanoidStateType.Jumping) end
 end)
 
-print("[Rozek v3] Cargado — God Mode | Auto Brain | Instant Pickup | Remove Map | Infinite Jump")
+print("[Rozek v4] Cargado - God | Auto Brain | Instant Pickup | Remove Map | Infinite Jump")
