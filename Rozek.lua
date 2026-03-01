@@ -38,142 +38,159 @@ local BtnGod, BtnAuto, BtnRemove
 -- Partes del mapa original a eliminar (restaurar al desactivar Remove)
 local MAP_DELETED = {
     -- 1
-    {path="Workspace.DefaultMap_SharedInstances.Floors.Common",        color=Color3.fromHex("60973C"), mat=Enum.Material.Plastic, name="Common",      pos=Vector3.new(242,             -2.999981,  -5.6016e-05),   size=Vector3.new(70,            6,          260)},
+    {path="Workspace.DefaultMap_SharedInstances.Floors.Common", color=Color3.fromRGB(96,151,60), mat=Enum.Material.Plastic, name="Common", pos=Vector3.new(242,-2.999980926513672,-5.6016146118054166e-05), size=Vector3.new(70,6,260)},
     -- 2
-    {path="Workspace.DefaultMap.Spawners.Common",                      color=Color3.fromHex("60973C"), mat=Enum.Material.Plastic, name="Common",      pos=Vector3.new(242,             -2.999981,  -5.6016e-05),   size=Vector3.new(70,            6,          260)},
+    {path="Workspace.DefaultMap.Spawners.Common", color=Color3.fromRGB(96,151,60), mat=Enum.Material.Plastic, name="Common", pos=Vector3.new(242,-2.999980926513672,-5.6016146118054166e-05), size=Vector3.new(70,6,260)},
     -- 3
-    {path="Workspace.DefaultMap_SharedInstances.Gaps.Gap1.Mud",        color=Color3.fromHex("D5733D"), mat=Enum.Material.Plastic, name="Mud",         pos=Vector3.new(200,             -9.024967,  -5.0486e-05),   size=Vector3.new(6.05,          260,        14)},
+    {path="Workspace.DefaultMap_SharedInstances.Gaps.Gap1.Mud", color=Color3.fromRGB(213,115,61), mat=Enum.Material.Plastic, name="Mud", pos=Vector3.new(200,-9.024967193603516,-5.0485989049775526e-05), size=Vector3.new(6.049999237060547,260,14)},
     -- 4
-    {path="Workspace.DefaultMap.FirstFloor",                           color=Color3.fromHex("60973C"), mat=Enum.Material.Plastic, name="FirstFloor",  pos=Vector3.new(173,             -2.999981,  -5.9032e-05),   size=Vector3.new(40,            6,          260)},
+    {path="Workspace.DefaultMap.FirstFloor", color=Color3.fromRGB(96,151,60), mat=Enum.Material.Plastic, name="FirstFloor", pos=Vector3.new(173,-2.999980926513672,-5.9032230637967587e-05), size=Vector3.new(40,6,260)},
     -- 5
-    {path="Workspace.DefaultMap.Gaps.Gap1.Mud",                        color=Color3.fromHex("D5733D"), mat=Enum.Material.Plastic, name="Mud",         pos=Vector3.new(200,             -9.024967,  -5.8115e-05),   size=Vector3.new(6.05,          260,        14)},
+    {path="Workspace.DefaultMap.Gaps.Gap1.Mud", color=Color3.fromRGB(213,115,61), mat=Enum.Material.Plastic, name="Mud", pos=Vector3.new(200,-9.024967193603516,-5.8115383581025526e-05), size=Vector3.new(6.049999237060547,260,14)},
     -- 6
-    {path="Workspace.DefaultMap.Ground",                               color=Color3.fromHex("2F9724"), mat=Enum.Material.Plastic, name="Ground",      pos=Vector3.new(72.99999,        -2.999981,  -6.3403e-05),   size=Vector3.new(160,           6,          376)},
+    {path="Workspace.DefaultMap.Ground", color=Color3.fromRGB(47,151,36), mat=Enum.Material.Plastic, name="Ground", pos=Vector3.new(72.99999237060547,-2.999980926513672,-6.340337131405249e-05), size=Vector3.new(160,6,376)},
     -- 7
-    {path="Workspace.GameObjects.PlaceSpecific.root.Misc.Roof",        color=Color3.fromHex("A3A2A5"), mat=Enum.Material.Plastic, name="Roof",        pos=Vector3.new(1182.5,           68.499992,  7.6294e-06),   size=Vector3.new(2047,          1,          260)},
+    {path="Workspace.GameObjects.PlaceSpecific.root.Misc.Roof", color=Color3.fromRGB(163,162,165), mat=Enum.Material.Plastic, name="Roof", pos=Vector3.new(1182.5,68.49999237060547,7.62939453125e-06), size=Vector3.new(2047,1,260)},
     -- 8
-    {path="Workspace.DefaultMap_SharedInstances.Floors.Uncommon",      color=Color3.fromHex("73973C"), mat=Enum.Material.Plastic, name="Uncommon",    pos=Vector3.new(341,             -2.999981,  -5.1689e-05),   size=Vector3.new(100,           6,          260)},
+    {path="Workspace.DefaultMap_SharedInstances.Floors.Uncommon", color=Color3.fromRGB(115,151,60), mat=Enum.Material.Plastic, name="Uncommon", pos=Vector3.new(341,-2.999980926513672,-5.168871575733647e-05), size=Vector3.new(100,6,260)},
     -- 9
-    {path="Workspace.DefaultMap.Spawners.Uncommon",                    color=Color3.fromHex("73973C"), mat=Enum.Material.Plastic, name="Uncommon",    pos=Vector3.new(341,             -2.999981,  -5.1689e-05),   size=Vector3.new(100,           6,          260)},
+    {path="Workspace.DefaultMap.Spawners.Uncommon", color=Color3.fromRGB(115,151,60), mat=Enum.Material.Plastic, name="Uncommon", pos=Vector3.new(341,-2.999980926513672,-5.168871575733647e-05), size=Vector3.new(100,6,260)},
     -- 10
-    {path="Workspace.DefaultMap_SharedInstances.Gaps.Gap2.Mud",        color=Color3.fromHex("D5733D"), mat=Enum.Material.Plastic, name="Mud",         pos=Vector3.new(284,             -9.024967,  -4.6814e-05),   size=Vector3.new(6.05,          260,        14)},
+    {path="Workspace.DefaultMap_SharedInstances.Gaps.Gap2.Mud", color=Color3.fromRGB(213,115,61), mat=Enum.Material.Plastic, name="Mud", pos=Vector3.new(284,-9.024967193603516,-4.6814231609459966e-05), size=Vector3.new(6.049999237060547,260,14)},
     -- 11
-    {path="Workspace.DefaultMap.Gaps.Gap2.Mud",                        color=Color3.fromHex("D5733D"), mat=Enum.Material.Plastic, name="Mud",         pos=Vector3.new(284,             -9.024967,  -5.4444e-05),   size=Vector3.new(6.05,          260,        14)},
+    {path="Workspace.DefaultMap.Gaps.Gap2.Mud", color=Color3.fromRGB(213,115,61), mat=Enum.Material.Plastic, name="Mud", pos=Vector3.new(284,-9.024967193603516,-5.4443626140709966e-05), size=Vector3.new(6.049999237060547,260,14)},
     -- 12
-    {path="Workspace.DefaultMap_SharedInstances.Floors.Rare",          color=Color3.fromHex("82973C"), mat=Enum.Material.Plastic, name="Rare",        pos=Vector3.new(470,             -2.999981,  -4.6050e-05),   size=Vector3.new(130,           6,          260)},
+    {path="Workspace.DefaultMap_SharedInstances.Floors.Rare", color=Color3.fromRGB(130,151,60), mat=Enum.Material.Plastic, name="Rare", pos=Vector3.new(470,-2.999980926513672,-4.604995046975091e-05), size=Vector3.new(130,6,260)},
     -- 13
-    {path="Workspace.DefaultMap.Spawners.Rare",                        color=Color3.fromHex("82973C"), mat=Enum.Material.Plastic, name="Rare",        pos=Vector3.new(470,             -2.999981,  -4.6050e-05),   size=Vector3.new(130,           6,          260)},
+    {path="Workspace.DefaultMap.Spawners.Rare", color=Color3.fromRGB(130,151,60), mat=Enum.Material.Plastic, name="Rare", pos=Vector3.new(470,-2.999980926513672,-4.604995046975091e-05), size=Vector3.new(130,6,260)},
     -- 14
-    {path="Workspace.DefaultMap_SharedInstances.Gaps.Gap3.Mud",        color=Color3.fromHex("D5733D"), mat=Enum.Material.Plastic, name="Mud",         pos=Vector3.new(398,             -9.024967,  -4.1831e-05),   size=Vector3.new(6.05,          260,        14)},
+    {path="Workspace.DefaultMap_SharedInstances.Gaps.Gap3.Mud", color=Color3.fromRGB(213,115,61), mat=Enum.Material.Plastic, name="Mud", pos=Vector3.new(398,-9.024967193603516,-4.1831131966318935e-05), size=Vector3.new(6.049999237060547,260,14)},
     -- 15
-    {path="Workspace.DefaultMap.Gaps.Gap3.Mud",                        color=Color3.fromHex("D5733D"), mat=Enum.Material.Plastic, name="Mud",         pos=Vector3.new(398,             -9.024967,  -4.9461e-05),   size=Vector3.new(6.05,          260,        14)},
+    {path="Workspace.DefaultMap.Gaps.Gap3.Mud", color=Color3.fromRGB(213,115,61), mat=Enum.Material.Plastic, name="Mud", pos=Vector3.new(398,-9.024967193603516,-4.9460526497568935e-05), size=Vector3.new(6.049999237060547,260,14)},
     -- 16
-    {path="Workspace.DefaultMap_SharedInstances.Gaps.Gap4.Mud",        color=Color3.fromHex("D5733D"), mat=Enum.Material.Plastic, name="Mud",         pos=Vector3.new(542.0001,        -9.024967,  -3.5537e-05),   size=Vector3.new(6.05,          260,        14)},
+    {path="Workspace.DefaultMap_SharedInstances.Gaps.Gap4.Mud", color=Color3.fromRGB(213,115,61), mat=Enum.Material.Plastic, name="Mud", pos=Vector3.new(542.0001220703125,-9.024967193603516,-3.5536686482373625e-05), size=Vector3.new(6.049999237060547,260,14)},
     -- 17
-    {path="Workspace.DefaultMap.Gaps.Gap4.Mud",                        color=Color3.fromHex("D5733D"), mat=Enum.Material.Plastic, name="Mud",         pos=Vector3.new(542,             -9.024967,  -4.3166e-05),   size=Vector3.new(6.05,          260,        14)},
+    {path="Workspace.DefaultMap.Gaps.Gap4.Mud", color=Color3.fromRGB(213,115,61), mat=Enum.Material.Plastic, name="Mud", pos=Vector3.new(542,-9.024967193603516,-4.316608828958124e-05), size=Vector3.new(6.049999237060547,260,14)},
     -- 18
-    {path="Workspace.DefaultMap_SharedInstances.Floors.Epic",          color=Color3.fromHex("8E973C"), mat=Enum.Material.Plastic, name="Epic",        pos=Vector3.new(649,             -2.999981,  -3.8226e-05),   size=Vector3.new(200,           6,          260)},
+    {path="Workspace.DefaultMap_SharedInstances.Floors.Epic", color=Color3.fromRGB(142,151,60), mat=Enum.Material.Plastic, name="Epic", pos=Vector3.new(649,-2.999980926513672,-3.8225611206144094e-05), size=Vector3.new(200,6,260)},
     -- 19
-    {path="Workspace.DefaultMap.Spawners.Epic",                        color=Color3.fromHex("8E973C"), mat=Enum.Material.Plastic, name="Epic",        pos=Vector3.new(649,             -2.999981,  -3.8226e-05),   size=Vector3.new(200,           6,          260)},
+    {path="Workspace.DefaultMap.Spawners.Epic", color=Color3.fromRGB(142,151,60), mat=Enum.Material.Plastic, name="Epic", pos=Vector3.new(649,-2.999980926513672,-3.8225611206144094e-05), size=Vector3.new(200,6,260)},
     -- 20
-    {path="Workspace.DefaultMap_SharedInstances.Floors.Legendary",     color=Color3.fromHex("97973D"), mat=Enum.Material.Plastic, name="Legendary",   pos=Vector3.new(913,             -2.999981,  -2.6686e-05),   size=Vector3.new(300,           6,          260)},
+    {path="Workspace.DefaultMap_SharedInstances.Floors.Legendary", color=Color3.fromRGB(151,151,61), mat=Enum.Material.Plastic, name="Legendary", pos=Vector3.new(913,-2.999980926513672,-2.668580418685451e-05), size=Vector3.new(300,6,260)},
     -- 21
-    {path="Workspace.DefaultMap.Spawners.Legendary",                   color=Color3.fromHex("97973D"), mat=Enum.Material.Plastic, name="Legendary",   pos=Vector3.new(913,             -2.999981,  -2.6686e-05),   size=Vector3.new(300,           6,          260)},
+    {path="Workspace.DefaultMap.Spawners.Legendary", color=Color3.fromRGB(151,151,61), mat=Enum.Material.Plastic, name="Legendary", pos=Vector3.new(913,-2.999980926513672,-2.668580418685451e-05), size=Vector3.new(300,6,260)},
     -- 22
-    {path="Workspace.DefaultMap_SharedInstances.Gaps.Gap5.Mud",        color=Color3.fromHex("D5733D"), mat=Enum.Material.Plastic, name="Mud",         pos=Vector3.new(756.0001,        -9.024967,  -2.6182e-05),   size=Vector3.new(6.05,          260,        14)},
+    {path="Workspace.DefaultMap_SharedInstances.Gaps.Gap5.Mud", color=Color3.fromRGB(213,115,61), mat=Enum.Material.Plastic, name="Mud", pos=Vector3.new(756.0001220703125,-9.024967193603516,-2.6182453439105302e-05), size=Vector3.new(6.049999237060547,260,14)},
     -- 23
-    {path="Workspace.DefaultMap.Gaps.Gap5.Mud",                        color=Color3.fromHex("D5733D"), mat=Enum.Material.Plastic, name="Mud",         pos=Vector3.new(756,             -9.024967,  -3.3812e-05),   size=Vector3.new(6.05,          260,        14)},
+    {path="Workspace.DefaultMap.Gaps.Gap5.Mud", color=Color3.fromRGB(213,115,61), mat=Enum.Material.Plastic, name="Mud", pos=Vector3.new(756,-9.024967193603516,-3.381185160833411e-05), size=Vector3.new(6.049999237060547,260,14)},
     -- 24
-    {path="Workspace.DefaultMap.Spawners.Mythical",                    color=Color3.fromHex("97932A"), mat=Enum.Material.Plastic, name="Mythical",    pos=Vector3.new(1310,            -2.999981,  -9.3324e-06),   size=Vector3.new(450,           6,          260)},
+    {path="Workspace.DefaultMap.Spawners.Mythical", color=Color3.fromRGB(151,147,42), mat=Enum.Material.Plastic, name="Mythical", pos=Vector3.new(1310,-2.999980926513672,-9.33238334255293e-06), size=Vector3.new(450,6,260)},
     -- 25
-    {path="Workspace.DefaultMap_SharedInstances.Floors.Mythical",      color=Color3.fromHex("97932A"), mat=Enum.Material.Plastic, name="Mythical",    pos=Vector3.new(1310,            -2.999981,  -9.3324e-06),   size=Vector3.new(450,           6,          260)},
+    {path="Workspace.DefaultMap_SharedInstances.Floors.Mythical", color=Color3.fromRGB(151,147,42), mat=Enum.Material.Plastic, name="Mythical", pos=Vector3.new(1310,-2.999980926513672,-9.33238334255293e-06), size=Vector3.new(450,6,260)},
     -- 26
-    {path="Workspace.DefaultMap_SharedInstances.Gaps.Gap6.Mud",        color=Color3.fromHex("D5733D"), mat=Enum.Material.Plastic, name="Mud",         pos=Vector3.new(1074,            -9.024967,  -1.2107e-05),   size=Vector3.new(6.05,          260,        22)},
+    {path="Workspace.DefaultMap_SharedInstances.Gaps.Gap6.Mud", color=Color3.fromRGB(213,115,61), mat=Enum.Material.Plastic, name="Mud", pos=Vector3.new(1074,-9.024967193603516,-1.2107389920856804e-05), size=Vector3.new(6.049999237060547,260,22)},
     -- 27
-    {path="Workspace.DefaultMap.Gaps.Gap6.Mud",                        color=Color3.fromHex("D5733D"), mat=Enum.Material.Plastic, name="Mud",         pos=Vector3.new(1074,            -9.024967,  -1.9912e-05),   size=Vector3.new(6.05,          260,        22)},
+    {path="Workspace.DefaultMap.Gaps.Gap6.Mud", color=Color3.fromRGB(213,115,61), mat=Enum.Material.Plastic, name="Mud", pos=Vector3.new(1074,-9.024967193603516,-1.991162935155444e-05), size=Vector3.new(6.049999237060547,260,22)},
     -- 28
-    {path="Workspace.DefaultMap_SharedInstances.Gaps.Gap7.Mud",        color=Color3.fromHex("D5733D"), mat=Enum.Material.Plastic, name="Mud",         pos=Vector3.new(1555,            -9.024967,   9.3112e-06),   size=Vector3.new(6.05,          260,        40)},
+    {path="Workspace.DefaultMap_SharedInstances.Gaps.Gap7.Mud", color=Color3.fromRGB(213,115,61), mat=Enum.Material.Plastic, name="Mud", pos=Vector3.new(1555,-9.024967193603516,9.311188478022814e-06), size=Vector3.new(6.049999237060547,260,40)},
     -- 29
-    {path="Workspace.DefaultMap.Gaps.Gap7.Mud",                        color=Color3.fromHex("D5733D"), mat=Enum.Material.Plastic, name="Mud",         pos=Vector3.new(1555,            -9.024967,   1.1135e-06),   size=Vector3.new(6.05,          260,        40)},
+    {path="Workspace.DefaultMap.Gaps.Gap7.Mud", color=Color3.fromRGB(213,115,61), mat=Enum.Material.Plastic, name="Mud", pos=Vector3.new(1555,-9.024967193603516,1.1135489330627024e-06), size=Vector3.new(6.049999237060547,260,40)},
     -- 30
-    {path="Workspace.DefaultMap_SharedInstances.Floors.Cosmic",        color=Color3.fromHex("ABA500"), mat=Enum.Material.Plastic, name="Cosmic",      pos=Vector3.new(1900,            -2.999981,   1.6457e-05),   size=Vector3.new(650,           6,          260)},
+    {path="Workspace.DefaultMap_SharedInstances.Floors.Cosmic", color=Color3.fromRGB(171,165,0), mat=Enum.Material.Plastic, name="Cosmic", pos=Vector3.new(1900,-2.999980926513672,1.6457335732411593e-05), size=Vector3.new(650,6,260)},
     -- 31
-    {path="Workspace.DefaultMap.Spawners.Cosmic",                      color=Color3.fromHex("ABA500"), mat=Enum.Material.Plastic, name="Cosmic",      pos=Vector3.new(1900,            -2.999981,   1.6457e-05),   size=Vector3.new(650,           6,          260)},
+    {path="Workspace.DefaultMap.Spawners.Cosmic", color=Color3.fromRGB(171,165,0), mat=Enum.Material.Plastic, name="Cosmic", pos=Vector3.new(1900,-2.999980926513672,1.6457335732411593e-05), size=Vector3.new(650,6,260)},
     -- 32
-    {path="Workspace.DefaultMap_SharedInstances.Gaps.Gap7.Mud",        color=Color3.fromHex("D5733D"), mat=Enum.Material.Plastic, name="Mud",         pos=Vector3.new(2252.5,          -9.024967,   3.9800e-05),   size=Vector3.new(6.05,          260,        55)},
+    {path="Workspace.DefaultMap_SharedInstances.Gaps.Gap7.Mud", color=Color3.fromRGB(213,115,61), mat=Enum.Material.Plastic, name="Mud", pos=Vector3.new(2252.5,-9.024967193603516,3.9799881051294506e-05), size=Vector3.new(6.049999237060547,260,55)},
     -- 33
-    {path="Workspace.DefaultMap.Gaps.Gap8.Mud",                        color=Color3.fromHex("D5733D"), mat=Enum.Material.Plastic, name="Mud",         pos=Vector3.new(2252.5,          -9.024967,   3.1602e-05),   size=Vector3.new(6.05,          260,        55)},
+    {path="Workspace.DefaultMap.Gaps.Gap8.Mud", color=Color3.fromRGB(213,115,61), mat=Enum.Material.Plastic, name="Mud", pos=Vector3.new(2252.5,-9.024967193603516,3.1602241506334394e-05), size=Vector3.new(6.049999237060547,260,55)},
     -- 34
-    {path="Workspace.DefaultMap_SharedInstances.AllowedSpaces.Waves2", color=Color3.fromHex("A3A2A5"), mat=Enum.Material.Plastic, name="Waves2",      pos=Vector3.new(3031.5498,        28.950020,  -1.999929),    size=Vector3.new(2048,          82.0999985, 276)},
+    {path="Workspace.DefaultMap_SharedInstances.AllowedSpaces.Waves2", color=Color3.fromRGB(163,162,165), mat=Enum.Material.Plastic, name="Waves2", pos=Vector3.new(3031.5498046875,28.95001983642578,-1.9999289512634277), size=Vector3.new(2048,82.0999984741211,276)},
     -- 35
-    {path="Workspace.GameObjects.PlaceSpecific.root.Misc.Roof",        color=Color3.fromHex("A3A2A5"), mat=Enum.Material.Plastic, name="Roof",        pos=Vector3.new(2570.5,           68.499992,   0),           size=Vector3.new(729,           1,          260)},
+    {path="Workspace.GameObjects.PlaceSpecific.root.Misc.Roof", color=Color3.fromRGB(163,162,165), mat=Enum.Material.Plastic, name="Roof", pos=Vector3.new(2570.5,68.49999237060547,0), size=Vector3.new(729,1,260)},
     -- 36
-    {path="Workspace.DefaultMap_SharedInstances.Floors.Cosmic",        color=Color3.fromHex("ABA500"), mat=Enum.Material.Plastic, name="Cosmic",      pos=Vector3.new(2605,            -2.999981,   4.7274e-05),   size=Vector3.new(650,           6,          260)},
+    {path="Workspace.DefaultMap_SharedInstances.Floors.Cosmic", color=Color3.fromRGB(171,165,0), mat=Enum.Material.Plastic, name="Cosmic", pos=Vector3.new(2605,-2.999980926513672,4.727386840386316e-05), size=Vector3.new(650,6,260)},
     -- 37
-    {path="Workspace.DefaultMap.Spawners.Cosmic",                      color=Color3.fromHex("ABA500"), mat=Enum.Material.Plastic, name="Cosmic",      pos=Vector3.new(2605,            -2.999981,   4.7274e-05),   size=Vector3.new(650,           6,          260)},
+    {path="Workspace.DefaultMap.Spawners.Cosmic", color=Color3.fromRGB(171,165,0), mat=Enum.Material.Plastic, name="Cosmic", pos=Vector3.new(2605,-2.999980926513672,4.727386840386316e-05), size=Vector3.new(650,6,260)},
     -- 38
-    {path="Workspace.DefaultMap_SharedInstances.Gaps.Gap8.Mud",        color=Color3.fromHex("D5733D"), mat=Enum.Material.Plastic, name="Mud",         pos=Vector3.new(2957.5,          -9.024967,   7.0944e-05),   size=Vector3.new(6.05,          260,        55)},
+    {path="Workspace.DefaultMap_SharedInstances.Gaps.Gap8.Mud", color=Color3.fromRGB(213,115,61), mat=Enum.Material.Plastic, name="Mud", pos=Vector3.new(2957.5,-9.024967193603516,7.094425382092595e-05), size=Vector3.new(6.049999237060547,260,55)},
     -- 39
-    {path="Workspace.DefaultMap.Gaps.Gap8.Mud",                        color=Color3.fromHex("D5733D"), mat=Enum.Material.Plastic, name="Mud",         pos=Vector3.new(2957.5,          -9.024967,   6.2419e-05),   size=Vector3.new(6.05,          260,        55)},
+    {path="Workspace.DefaultMap.Gaps.Gap8.Mud", color=Color3.fromRGB(213,115,61), mat=Enum.Material.Plastic, name="Mud", pos=Vector3.new(2957.5,-9.024967193603516,6.241878145374358e-05), size=Vector3.new(6.049999237060547,260,55)},
     -- 40
-    {path="Workspace.GameObjects.PlaceSpecific.root.Misc.Roof",        color=Color3.fromHex("A3A2A5"), mat=Enum.Material.Plastic, name="Roof",        pos=Vector3.new(3613.004395,      70.500031,   0),           size=Vector3.new(1475.5003662,  1,          260)},
+    {path="Workspace.GameObjects.PlaceSpecific.root.Misc.Roof", color=Color3.fromRGB(163,162,165), mat=Enum.Material.Plastic, name="Roof", pos=Vector3.new(3613.00439453125,70.50003051757812,0), size=Vector3.new(1475.5003662109375,1,260)},
     -- 41
-    {path="Workspace.DefaultMap_SharedInstances.Floors.Secret1",       color=Color3.fromHex("CBC100"), mat=Enum.Material.Plastic, name="Secret1",     pos=Vector3.new(3135,            -2.999981,   7.0441e-05),   size=Vector3.new(299.9999695,   6,          260)},
+    {path="Workspace.DefaultMap_SharedInstances.Floors.Secret1", color=Color3.fromRGB(203,193,0), mat=Enum.Material.Plastic, name="Secret1", pos=Vector3.new(3135,-2.999980926513672,7.044090307317674e-05), size=Vector3.new(299.9999694824219,6,260)},
     -- 42
-    {path="Workspace.DefaultMap.Spawners.Secret",                      color=Color3.fromHex("CBC100"), mat=Enum.Material.Plastic, name="Secret",      pos=Vector3.new(3135,            -2.999981,   7.0441e-05),   size=Vector3.new(299.9999695,   6,          260)},
+    {path="Workspace.DefaultMap.Spawners.Secret", color=Color3.fromRGB(203,193,0), mat=Enum.Material.Plastic, name="Secret", pos=Vector3.new(3135,-2.999980926513672,7.044090307317674e-05), size=Vector3.new(299.9999694824219,6,260)},
     -- 43
-    {path="Workspace.DefaultMap_SharedInstances.Floors.Secret2",       color=Color3.fromHex("CBC100"), mat=Enum.Material.Plastic, name="Secret2",     pos=Vector3.new(3490,            -2.999981,   8.5958e-05),   size=Vector3.new(299.9999695,   6,          260)},
+    {path="Workspace.DefaultMap_SharedInstances.Floors.Secret2", color=Color3.fromRGB(203,193,0), mat=Enum.Material.Plastic, name="Secret2", pos=Vector3.new(3490,-2.999980926513672,8.595845429226756e-05), size=Vector3.new(299.9999694824219,6,260)},
     -- 44
-    {path="Workspace.DefaultMap.Spawners.Secret",                      color=Color3.fromHex("CBC100"), mat=Enum.Material.Plastic, name="Secret",      pos=Vector3.new(3490,            -2.999981,   8.5958e-05),   size=Vector3.new(299.9999695,   6,          260)},
+    {path="Workspace.DefaultMap.Spawners.Secret", color=Color3.fromRGB(203,193,0), mat=Enum.Material.Plastic, name="Secret", pos=Vector3.new(3490,-2.999980926513672,8.595845429226756e-05), size=Vector3.new(299.9999694824219,6,260)},
     -- 45
-    {path="Workspace.DefaultMap_SharedInstances.Gaps.Gap8.Mud",        color=Color3.fromHex("D5733D"), mat=Enum.Material.Plastic, name="Mud",         pos=Vector3.new(3312.5,          -9.024967,   8.6462e-05),   size=Vector3.new(6.05,          260,        55)},
+    {path="Workspace.DefaultMap_SharedInstances.Gaps.Gap8.Mud", color=Color3.fromRGB(213,115,61), mat=Enum.Material.Plastic, name="Mud", pos=Vector3.new(3312.5,-9.024967193603516,8.646179048810154e-05), size=Vector3.new(6.049999237060547,260,55)},
     -- 46
-    {path="Workspace.DefaultMap.Gaps.Gap8.Mud",                        color=Color3.fromHex("D5733D"), mat=Enum.Material.Plastic, name="Mud",         pos=Vector3.new(3312.5,          -9.024967,   7.7936e-05),   size=Vector3.new(6.05,          260,        55)},
+    {path="Workspace.DefaultMap.Gaps.Gap8.Mud", color=Color3.fromRGB(213,115,61), mat=Enum.Material.Plastic, name="Mud", pos=Vector3.new(3312.5,-9.024967193603516,7.793631812091917e-05), size=Vector3.new(6.049999237060547,260,55)},
     -- 47
-    {path="Workspace.DefaultMap_SharedInstances.Gaps.Gap9.Mud",        color=Color3.fromHex("D5733D"), mat=Enum.Material.Plastic, name="Mud",         pos=Vector3.new(3667.5,          -9.024967,   1.0198e-04),   size=Vector3.new(6.05,          260,        55)},
+    {path="Workspace.DefaultMap_SharedInstances.Gaps.Gap9.Mud", color=Color3.fromRGB(213,115,61), mat=Enum.Material.Plastic, name="Mud", pos=Vector3.new(3667.5,-9.024967193603516,0.00010197934170719236), size=Vector3.new(6.049999237060547,260,55)},
     -- 48
-    {path="Workspace.DefaultMap.Gaps.Gap9.Mud",                        color=Color3.fromHex("D5733D"), mat=Enum.Material.Plastic, name="Mud",         pos=Vector3.new(3667.5,          -9.024967,   9.3454e-05),   size=Vector3.new(6.05,          260,        55)},
+    {path="Workspace.DefaultMap.Gaps.Gap9.Mud", color=Color3.fromRGB(213,115,61), mat=Enum.Material.Plastic, name="Mud", pos=Vector3.new(3667.5,-9.024967193603516,9.345386934000999e-05), size=Vector3.new(6.049999237060547,260,55)},
     -- 49
-    {path="Workspace.DefaultMap_SharedInstances.Floors.Secret3",       color=Color3.fromHex("CBC100"), mat=Enum.Material.Plastic, name="Secret3",     pos=Vector3.new(3853,            -2.999981,   1.0183e-04),   size=Vector3.new(299.9999695,   6,          260)},
+    {path="Workspace.DefaultMap_SharedInstances.Floors.Secret3", color=Color3.fromRGB(203,193,0), mat=Enum.Material.Plastic, name="Secret3", pos=Vector3.new(3853,-2.999980926513672,0.00010182568803429604), size=Vector3.new(299.9999694824219,6,260)},
     -- 50
-    {path="Workspace.DefaultMap.Spawners.Secret",                      color=Color3.fromHex("CBC100"), mat=Enum.Material.Plastic, name="Secret",      pos=Vector3.new(3853,            -2.999981,   1.0183e-04),   size=Vector3.new(299.9999695,   6,          260)},
+    {path="Workspace.DefaultMap.Spawners.Secret", color=Color3.fromRGB(203,193,0), mat=Enum.Material.Plastic, name="Secret", pos=Vector3.new(3853,-2.999980926513672,0.00010182568803429604), size=Vector3.new(299.9999694824219,6,260)},
     -- 51
-    {path="Workspace.DefaultMap.Spawners.Celestial",                   color=Color3.fromHex("CBC100"), mat=Enum.Material.Plastic, name="Celestial",   pos=Vector3.new(3845,            -2.999981,   1.0148e-04),   size=Vector3.new(299.9999695,   6,          260)},
+    {path="Workspace.DefaultMap.Spawners.Celestial", color=Color3.fromRGB(203,193,0), mat=Enum.Material.Plastic, name="Celestial", pos=Vector3.new(3845,-2.999980926513672,0.00010147599095944315), size=Vector3.new(299.9999694824219,6,260)},
     -- 52
-    {path="Workspace.WackyWave_Visual.Hitbox3",                        color=Color3.fromHex("A3A2A5"), mat=Enum.Material.Plastic, name="Hitbox3",     pos=Vector3.new(3986.665039,      16.374998,  86.666794),    size=Vector3.new(25.516001,     28.75,      86.666664)},
+    {path="Workspace.WackyWave_Visual.Hitbox3", color=Color3.fromRGB(163,162,165), mat=Enum.Material.Plastic, name="Hitbox3", pos=Vector3.new(3986.6650390625,16.374998092651367,86.66679382324219), size=Vector3.new(25.516000747680664,28.75,86.66666412353516)},
     -- 53
-    {path="Workspace.DefaultMap_SharedInstances.Gaps.Gap9.Mud",        color=Color3.fromHex("D5733D"), mat=Enum.Material.Plastic, name="Mud",         pos=Vector3.new(4022.5,          -9.024967,   1.1750e-04),   size=Vector3.new(6.05,          260,        55)},
+    {path="Workspace.DefaultMap_SharedInstances.Gaps.Gap9.Mud", color=Color3.fromRGB(213,115,61), mat=Enum.Material.Plastic, name="Mud", pos=Vector3.new(4022.5,-9.024967193603516,0.00011749687837436795), size=Vector3.new(6.049999237060547,260,55)},
     -- 54
-    {path="Workspace.DefaultMap.Gaps.Gap9.Mud",                        color=Color3.fromHex("D5733D"), mat=Enum.Material.Plastic, name="Mud",         pos=Vector3.new(4022.5,          -9.024967,   1.0897e-04),   size=Vector3.new(6.05,          260,        55)},
+    {path="Workspace.DefaultMap.Gaps.Gap9.Mud", color=Color3.fromRGB(213,115,61), mat=Enum.Material.Plastic, name="Mud", pos=Vector3.new(4022.5,-9.024967193603516,0.00010897140600718558), size=Vector3.new(6.049999237060547,260,55)},
     -- 55
-    {path="Workspace.DefaultMap_SharedInstances.AllowedSpaces.Waves3", color=Color3.fromHex("A3A2A5"), mat=Enum.Material.Plastic, name="Waves3",      pos=Vector3.new(4205.774902,      28.950020,  -1.999878),    size=Vector3.new(300.450378,    82.0999985, 276)},
+    {path="Workspace.DefaultMap_SharedInstances.AllowedSpaces.Waves3", color=Color3.fromRGB(163,162,165), mat=Enum.Material.Plastic, name="Waves3", pos=Vector3.new(4205.77490234375,28.95001983642578,-1.9998775720596313), size=Vector3.new(300.45037841796875,82.0999984741211,276)},
     -- 56
-    {path="Workspace.DefaultMap_SharedInstances.Floors.Celestial",     color=Color3.fromHex("CBC100"), mat=Enum.Material.Plastic, name="Celestial",   pos=Vector3.new(4164.5,          -3,          0),           size=Vector3.new(229,           6,          260)},
+    {path="Workspace.DefaultMap_SharedInstances.Floors.Celestial", color=Color3.fromRGB(203,193,0), mat=Enum.Material.Plastic, name="Celestial", pos=Vector3.new(4164.5,-3,0), size=Vector3.new(229,6,260)},
     -- 57
-    {path="Workspace.DefaultMap.Spawners.Divine",                      color=Color3.fromHex("CBC100"), mat=Enum.Material.Plastic, name="Divine",      pos=Vector3.new(4164.5,          -3,          0),           size=Vector3.new(229,           6,          260)},
+    {path="Workspace.DefaultMap.Spawners.Divine", color=Color3.fromRGB(203,193,0), mat=Enum.Material.Plastic, name="Divine", pos=Vector3.new(4164.5,-3,0), size=Vector3.new(229,6,260)},
     -- 58
-    {path="Workspace.DefaultMap.TowerGround",                          color=Color3.fromHex("CBC100"), mat=Enum.Material.Plastic, name="TowerGround", pos=Vector3.new(4314.5,          -2.999981,   1.2200e-04),   size=Vector3.new(70.999954,     6,          260)},
-    -- 59 (Torre Part 1)
-    {path="Workspace.GameObjects.PlaceSpecific.root.Tower.Part",       color=Color3.fromHex("5B5D69"), mat=Enum.Material.Plastic, name="Part",        pos=Vector3.new(4313.832520,       0.799339,  -2.124415),    size=Vector3.new(57.658379,     2.351409,   110.238846)},
-    -- 60 (Torre Part 2)
-    {path="Workspace.GameObjects.PlaceSpecific.root.Tower.Part",       color=Color3.fromHex("5B5D69"), mat=Enum.Material.Plastic, name="Part",        pos=Vector3.new(4304.290527,       0.141930,  -1.097811),    size=Vector3.new(47.632408,     1.671976,    76.730042)},
-    -- 61 (Torre Part 3)
-    {path="Workspace.GameObjects.PlaceSpecific.root.Tower.Part",       color=Color3.fromHex("5B5D69"), mat=Enum.Material.Plastic, name="Part",        pos=Vector3.new(4321.747070,       1.309166,  -2.021373),    size=Vector3.new(41.828934,     3.371163,   209.273361)},
-    -- 62 (Torre Union 1)
-    {path="Workspace.GameObjects.PlaceSpecific.root.Tower.Union",      color=Color3.fromHex("5B5D69"), mat=Enum.Material.Plastic, name="Union",       pos=Vector3.new(4317.728027,      21.425194,  41.329739),    size=Vector3.new(10.984474,    20.510284,    48.470699)},
-    -- 63 (Torre Part 4)
-    {path="Workspace.GameObjects.PlaceSpecific.root.Tower.Part",       color=Color3.fromHex("5B5D69"), mat=Enum.Material.Plastic, name="Part",        pos=Vector3.new(4317.727539,       0.160423,  -1.956494),    size=Vector3.new(10.984708,   103.945686,    7.073647)},
-    -- 64 (Torre Union 2)
-    {path="Workspace.GameObjects.PlaceSpecific.root.Tower.Union",      color=Color3.fromHex("5B5D69"), mat=Enum.Material.Plastic, name="Union",       pos=Vector3.new(4317.727539,      20.527273, -46.674198),    size=Vector3.new(10.984474,    20.510277,   46.674847)},
+    {path="Workspace.DefaultMap.TowerGround", color=Color3.fromRGB(203,193,0), mat=Enum.Material.Plastic, name="TowerGround", pos=Vector3.new(4314.5,-2.999980926513672,0.00012199849879834801), size=Vector3.new(70.99995422363281,6,260)},
+    -- 59
+    {path="Workspace.GameObjects.PlaceSpecific.root.Tower.Part", color=Color3.fromRGB(91,93,105), mat=Enum.Material.Plastic, name="Part", pos=Vector3.new(4313.83251953125,0.7993392944335938,-2.1244149208068848), size=Vector3.new(57.65837860107422,2.351409435272217,110.23884582519531)},
+    -- 60
+    {path="Workspace.GameObjects.PlaceSpecific.root.Tower.Part", color=Color3.fromRGB(91,93,105), mat=Enum.Material.Plastic, name="Part", pos=Vector3.new(4304.29052734375,0.14192962646484375,-1.0978106260299683), size=Vector3.new(47.632408142089844,1.671976089477539,76.73004150390625)},
+    -- 61
+    {path="Workspace.GameObjects.PlaceSpecific.root.Tower.Part", color=Color3.fromRGB(91,93,105), mat=Enum.Material.Plastic, name="Part", pos=Vector3.new(4321.7470703125,1.3091659545898438,-2.0213727951049805), size=Vector3.new(41.82893371582031,3.3711633682250977,209.2733612060547)},
+    -- 62
+    {path="Workspace.GameObjects.PlaceSpecific.root.Tower.Union", color=Color3.fromRGB(91,93,105), mat=Enum.Material.Plastic, name="Union", pos=Vector3.new(4317.72802734375,21.425193786621094,41.32973861694336), size=Vector3.new(10.984474182128906,20.510284423828125,48.470699310302734)},
+    -- 63
+    {path="Workspace.GameObjects.PlaceSpecific.root.Tower.Part", color=Color3.fromRGB(91,93,105), mat=Enum.Material.Plastic, name="Part", pos=Vector3.new(4317.7275390625,0.16042327880859375,-1.9564944505691528), size=Vector3.new(10.984707832336426,103.94568634033203,7.073647499084473)},
+    -- 64
+    {path="Workspace.GameObjects.PlaceSpecific.root.Tower.Union", color=Color3.fromRGB(91,93,105), mat=Enum.Material.Plastic, name="Union", pos=Vector3.new(4317.7275390625,20.527273178100586,-46.674198150634766), size=Vector3.new(10.984474182128906,20.510276794433594,46.67484664916992)},
 }
 
 -- Partes nuevas a agregar (se destruyen al desactivar Remove)
 local MAP_ADDED = {
-    {pos=Vector3.new(60.1,    -0.6,   9.7),   size=Vector3.new(186,   0.5, 405), color=Color3.fromHex("50B450"), mat=Enum.Material.Pebble},
-    {pos=Vector3.new(1144.5,  -9.5,   10.4),  size=Vector3.new(2048,  5.5, 295), color=Color3.fromHex("50B450"), mat=Enum.Material.Pebble},
-    {pos=Vector3.new(150,     -5.5,   8),     size=Vector3.new(8.5,   9.5, 300.5),color=Color3.fromHex("50B450"), mat=Enum.Material.Pebble},
-    {pos=Vector3.new(3190,    -7.5,  -6),     size=Vector3.new(2048,  1,   310), color=Color3.fromHex("50B450"), mat=Enum.Material.Pebble},
-    {pos=Vector3.new(4225,   -16,   -13),     size=Vector3.new(290,  21,   330), color=Color3.fromHex("50B450"), mat=Enum.Material.Pebble},
+    -- 1
+    {pos=Vector3.new(60.10002899169922,-0.5999994277954102,9.700004577636719), size=Vector3.new(186,0.5,405), color=Color3.fromRGB(80,180,80), mat=Enum.Material.Pebble},
+    -- 2
+    {pos=Vector3.new(1144.5,-9.5,10.399993896484375), size=Vector3.new(2048,5.5,295), color=Color3.fromRGB(80,180,80), mat=Enum.Material.Pebble},
+    -- 3
+    {pos=Vector3.new(150,-5.5,8), size=Vector3.new(8.5,9.5,300.5), color=Color3.fromRGB(80,180,80), mat=Enum.Material.Pebble},
+    -- 4
+    {pos=Vector3.new(3190,-7.5,-6), size=Vector3.new(2048,1,310), color=Color3.fromRGB(80,180,80), mat=Enum.Material.Pebble},
+    -- 5
+    {pos=Vector3.new(4225,-16,-13), size=Vector3.new(290,21,330), color=Color3.fromRGB(80,180,80), mat=Enum.Material.Pebble},
+    -- 6
+    {pos=Vector3.new(4336,-4,-4), size=Vector3.new(63,4,330), color=Color3.fromRGB(15,15,15), mat=Enum.Material.Pebble},
+    -- 7
+    {pos=Vector3.new(4303,-5,-15), size=Vector3.new(10,3,345), color=Color3.fromRGB(15,15,15), mat=Enum.Material.Pebble},
+    -- 8
+    {pos=Vector3.new(4155.6005859375,-5.5,-132.5999755859375), size=Vector3.new(435,11,5), color=Color3.fromRGB(15,15,15), mat=Enum.Material.Pebble},
+    -- 9
+    {pos=Vector3.new(4170,-5.500000476837158,132.5999755859375), size=Vector3.new(460,11,5), color=Color3.fromRGB(15,15,15), mat=Enum.Material.Pebble},
+    -- 10
+    {pos=Vector3.new(4309.59765625,-2,-94), size=Vector3.new(10,175.5,75), color=Color3.fromRGB(15,15,15), mat=Enum.Material.Pebble},
+    -- 11
+    {pos=Vector3.new(4309.5966796875,-2,92.60003662109375), size=Vector3.new(10,176,80), color=Color3.fromRGB(15,15,15), mat=Enum.Material.Pebble},
 }
 
 -- Tabla para guardar referencias: partes originales ocultas y partes nuevas creadas
