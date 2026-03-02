@@ -750,6 +750,89 @@ local function stopAutoBrain()
 end
 
 -- =============================================
+--  AUTO TOWER - deposita brainrots en la Tower
+--  Busca cualquier ProximityPrompt en la Tower
+--  que no sea Skip Cooldown y lo dispara
+--  SIEMPRE ACTIVO
+-- =============================================
+local TOWER_RANGE    = 35  -- un poco mas que MaxActivationDistance del prompt (30)
+local TOWER_INTERVAL = 0.1
+
+local towerModel = nil
+local function getTower()
+    if towerModel and towerModel.Parent then return towerModel end
+    local t = workspace:FindFirstChild("GameObjects")
+    if t then t = t:FindFirstChild("PlaceSpecific") end
+    if t then t = t:FindFirstChild("root") end
+    if t then t = t:FindFirstChild("Tower") end
+    towerModel = t
+    return towerModel
+end
+
+local towerMainPart = nil
+local function getTowerMainPart()
+    if towerMainPart and towerMainPart.Parent then return towerMainPart end
+    local tower = getTower()
+    if tower then towerMainPart = tower:FindFirstChild("Main") end
+    return towerMainPart
+end
+
+-- Ignorar Skip Cooldown (unico prompt permanente)
+local function isSubmitPrompt(prompt)
+    if not prompt or not prompt.Parent then return false end
+    local action = prompt.ActionText:lower()
+    if action:find("skip") then return false end
+    if action:find("cooldown") then return false end
+    if action:find("r%$") then return false end
+    return true
+end
+
+local lastFired = 0
+
+task.spawn(function()
+    while true do
+        local char = lp.Character
+        local root = char and char:FindFirstChild("HumanoidRootPart")
+        local main = getTowerMainPart()
+
+        if root and main then
+            -- Usar distancia horizontal (X,Z) porque Main esta muy alto
+            local rp = root.Position
+            local mp = main.Position
+            local hdist = Vector2.new(rp.X - mp.X, rp.Z - mp.Z).Magnitude
+            if hdist <= TOWER_RANGE then
+                local now = tick()
+                local tower = getTower()
+                if tower then
+                    for _, obj in ipairs(tower:GetDescendants()) do
+                        if obj:IsA("ProximityPrompt") and isSubmitPrompt(obj) then
+                            -- Verificar distancia al prompt especificamente
+                            local part = obj.Parent
+                            local promptPos = (part and part:IsA("BasePart")) and part.Position or mp
+                            local pdist = (root.Position - promptPos).Magnitude
+                            if pdist <= obj.MaxActivationDistance + 5 then
+                                if (now - lastFired) >= 0.15 then
+                                    obj.HoldDuration = 0
+                                    obj.Enabled = true
+                                    if fireproximityprompt then
+                                        pcall(fireproximityprompt, obj)
+                                    end
+                                    if triggerproximityprompt then
+                                        pcall(triggerproximityprompt, obj)
+                                    end
+                                    lastFired = now
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+        end
+        task.wait(TOWER_INTERVAL)
+    end
+end)
+
+-- =============================================
 --  REMOVE MAP
 -- =============================================
 local function activateRemove()
